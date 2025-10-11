@@ -4,6 +4,7 @@ const App = () => {
   const [scrollY, setScrollY] = useState(0);
 
   useEffect(() => {
+    // Scroll handling is fine as-is
     const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -11,7 +12,7 @@ const App = () => {
 
   return (
     <div className="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-gray-100 min-h-screen font-sans relative overflow-hidden">
-      {/* Animated background elements */}
+      {/* Animated background elements (no change needed) */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 -left-48 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
         <div
@@ -24,22 +25,26 @@ const App = () => {
         ></div>
       </div>
 
-      <div className="relative z-10 p-8 flex flex-col items-center">
+      {/* Main Content Container: Adjusted padding for smaller screens */}
+      <div className="relative z-10 p-4 sm:p-8 flex flex-col items-center">
         {/* Header */}
         <header
-          className="my-20 flex flex-col items-center"
+          // Reduced vertical margin for mobile
+          className="my-10 sm:my-20 flex flex-col items-center"
           style={{ transform: `translateY(${scrollY * 0.1}px)` }}
         >
-          <div className="relative mb-12 group">
+          <div className="relative mb-8 sm:mb-12 group">
             <div className="absolute -inset-2 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full blur-xl opacity-50 group-hover:opacity-75 transition duration-500"></div>
             <img
               src="sportsync_logo.jpg"
               alt="SportsSync Logo"
-              className="relative w-36 h-36 rounded-full shadow-2xl transform transition-transform duration-500 group-hover:scale-110"
+              // Adjusted size for mobile
+              className="relative w-24 h-24 sm:w-36 sm:h-36 rounded-full shadow-2xl transform transition-transform duration-500 group-hover:scale-110"
             />
           </div>
           <h1
-            className="text-7xl font-black text-center tracking-tight leading-tight mb-4"
+            // Significantly reduced font size on mobile (text-4xl)
+            className="text-4xl sm:text-7xl font-black text-center tracking-tight leading-snug sm:leading-tight mb-4"
             style={{
               fontFamily: "'Inter', 'SF Pro Display', system-ui, sans-serif",
             }}
@@ -49,13 +54,14 @@ const App = () => {
               SportsSync
             </span>
           </h1>
-          <div className="w-24 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full"></div>
+          <div className="w-16 sm:w-24 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full"></div>
         </header>
 
         {/* Warming up */}
-        <section className="mb-24 text-center max-w-4xl">
+        <section className="mb-16 sm:mb-24 text-center max-w-4xl">
           <h2
-            className="text-5xl font-bold mb-8 bg-gradient-to-r from-yellow-300 to-orange-400 text-transparent bg-clip-text"
+            // Reduced font size on mobile (text-3xl)
+            className="text-3xl sm:text-5xl font-bold mb-6 sm:mb-8 bg-gradient-to-r from-yellow-300 to-orange-400 text-transparent bg-clip-text"
             style={{
               fontFamily: "'Inter', 'SF Pro Display', system-ui, sans-serif",
             }}
@@ -64,7 +70,8 @@ const App = () => {
           </h2>
 
           <p
-            className="text-xl text-gray-300 leading-relaxed"
+            // Reduced font size on mobile (text-lg)
+            className="text-lg sm:text-xl text-gray-300 leading-relaxed px-2"
             style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
           >
             First, I will cover the problem this application aims to solve. Then
@@ -75,10 +82,11 @@ const App = () => {
         </section>
 
         {/* Problem */}
-        <section className="mb-24 max-w-4xl">
-          <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-3xl p-12 border border-slate-700/50 shadow-2xl">
+        <section className="mb-16 sm:mb-24 max-w-4xl px-2">
+          <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-3xl p-6 sm:p-12 border border-slate-700/50 shadow-2xl">
             <h2
-              className="text-4xl font-bold mb-8 text-center bg-gradient-to-r from-cyan-300 to-blue-400 text-transparent bg-clip-text"
+              // Reduced font size on mobile (text-3xl)
+              className="text-3xl sm:text-4xl font-bold mb-6 sm:mb-8 text-center bg-gradient-to-r from-cyan-300 to-blue-400 text-transparent bg-clip-text"
               style={{
                 fontFamily: "'Inter', 'SF Pro Display', system-ui, sans-serif",
               }}
@@ -86,7 +94,8 @@ const App = () => {
               In our institute...
             </h2>
             <div
-              className="space-y-6 text-lg text-gray-300 leading-relaxed"
+              // Reduced font size on mobile (text-base)
+              className="space-y-6 text-base sm:text-lg text-gray-300 leading-relaxed"
               style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
             >
               <p>
@@ -117,9 +126,10 @@ const App = () => {
         </section>
 
         {/* High-level Design */}
-        <section className="mb-24 w-full max-w-7xl">
+        <section className="mb-16 sm:mb-24 w-full max-w-7xl px-2">
           <h2
-            className="text-4xl font-bold mb-8 text-center bg-gradient-to-r from-green-300 to-emerald-400 text-transparent bg-clip-text"
+            // Reduced font size on mobile (text-3xl)
+            className="text-3xl sm:text-4xl font-bold mb-6 sm:mb-8 text-center bg-gradient-to-r from-green-300 to-emerald-400 text-transparent bg-clip-text"
             style={{
               fontFamily: "'Inter', 'SF Pro Display', system-ui, sans-serif",
             }}
@@ -127,24 +137,26 @@ const App = () => {
             High-Level Diagram
           </h2>
           <p
-            className="mb-8 text-center text-xl text-gray-300"
+            // Reduced font size on mobile (text-lg)
+            className="mb-6 sm:mb-8 text-center text-lg sm:text-xl text-gray-300"
             style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
           >
             Here is a high-level diagram of how SportsSync works:
           </p>
-          <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm p-8 rounded-3xl border border-slate-700/50 shadow-2xl flex justify-center items-center hover:border-slate-600/50 transition-all duration-300">
+          <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm p-4 sm:p-8 rounded-3xl border border-slate-700/50 shadow-2xl flex justify-center items-center hover:border-slate-600/50 transition-all duration-300">
             <img
               src="High-level.png"
               alt="High-Level Diagram"
-              className="w-full h-auto max-h-[90vh] rounded-2xl object-contain shadow-xl"
+              className="w-full h-auto max-h-[70vh] sm:max-h-[90vh] rounded-2xl object-contain shadow-xl"
             />
           </div>
         </section>
 
         {/* Microservices */}
-        <section className="mb-24 w-full max-w-6xl">
+        <section className="mb-16 sm:mb-24 w-full max-w-6xl px-2">
           <h2
-            className="text-5xl font-bold mb-16 text-center bg-gradient-to-r from-violet-300 to-fuchsia-400 text-transparent bg-clip-text"
+            // Reduced font size on mobile (text-4xl)
+            className="text-4xl sm:text-5xl font-bold mb-10 sm:mb-16 text-center bg-gradient-to-r from-violet-300 to-fuchsia-400 text-transparent bg-clip-text"
             style={{
               fontFamily: "'Inter', 'SF Pro Display', system-ui, sans-serif",
             }}
@@ -152,13 +164,13 @@ const App = () => {
             Microservices Architecture
           </h2>
 
-          <div className="space-y-20">
+          <div className="space-y-12 sm:space-y-20">
             {/* Auth Service */}
-            <div className="bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm rounded-3xl p-10 border border-slate-700/50 shadow-2xl hover:border-blue-500/30 transition-all duration-300">
-              <div className="flex items-center gap-4 mb-6">
-                <span className="text-5xl font-black text-blue-400">01</span>
+            <div className="bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm rounded-3xl p-6 sm:p-10 border border-slate-700/50 shadow-2xl hover:border-blue-500/30 transition-all duration-300">
+              <div className="flex items-center gap-4 mb-4 sm:mb-6">
+                <span className="text-4xl sm:text-5xl font-black text-blue-400">01</span>
                 <h3
-                  className="text-3xl font-bold text-blue-300"
+                  className="text-2xl sm:text-3xl font-bold text-blue-300"
                   style={{
                     fontFamily:
                       "'Inter', 'SF Pro Display', system-ui, sans-serif",
@@ -168,7 +180,7 @@ const App = () => {
                 </h3>
               </div>
               <p
-                className="mb-8 text-lg text-gray-300 leading-relaxed"
+                className="mb-6 sm:mb-8 text-base sm:text-lg text-gray-300 leading-relaxed"
                 style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
               >
                 Manages user sign-up, login, and Google OAuth 2.0 integration.
@@ -177,26 +189,29 @@ const App = () => {
                 tokens in Postgres.
               </p>
 
-              <div className="flex justify-center items-start gap-6 flex-wrap w-full">
+              {/* Stack images vertically on small screens, side-by-side on larger */}
+              <div className="flex flex-col sm:flex-row justify-center items-start gap-4 sm:gap-6 w-full">
                 <img
                   src="Auth-service.png"
                   alt="Auth Service Flow"
-                  className="w-[48%] min-w-[300px] h-auto rounded-2xl shadow-2xl border border-slate-700/50 hover:scale-[1.02] transition-transform duration-300"
+                  // Added w-full for mobile, adjusted w-[48%] for sm:
+                  className="w-full sm:w-[48%] h-auto rounded-2xl shadow-2xl border border-slate-700/50 hover:scale-[1.02] transition-transform duration-300"
                 />
                 <img
                   src="Google-Oauth-2.0.png"
                   alt="Auth Service Database Diagram"
-                  className="w-[48%] min-w-[300px] h-auto rounded-2xl shadow-2xl border border-slate-700/50 hover:scale-[1.02] transition-transform duration-300"
+                  // Added w-full for mobile, adjusted w-[48%] for sm:
+                  className="w-full sm:w-[48%] h-auto rounded-2xl shadow-2xl border border-slate-700/50 hover:scale-[1.02] transition-transform duration-300"
                 />
               </div>
             </div>
 
-            {/* User Service */}
-            <div className="bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm rounded-3xl p-10 border border-slate-700/50 shadow-2xl hover:border-purple-500/30 transition-all duration-300">
-              <div className="flex items-center gap-4 mb-6">
-                <span className="text-5xl font-black text-purple-400">02</span>
+            {/* User Service (Applied responsiveness to p and h3) */}
+            <div className="bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm rounded-3xl p-6 sm:p-10 border border-slate-700/50 shadow-2xl hover:border-purple-500/30 transition-all duration-300">
+              <div className="flex items-center gap-4 mb-4 sm:mb-6">
+                <span className="text-4xl sm:text-5xl font-black text-purple-400">02</span>
                 <h3
-                  className="text-3xl font-bold text-purple-300"
+                  className="text-2xl sm:text-3xl font-bold text-purple-300"
                   style={{
                     fontFamily:
                       "'Inter', 'SF Pro Display', system-ui, sans-serif",
@@ -206,7 +221,7 @@ const App = () => {
                 </h3>
               </div>
               <p
-                className="mb-8 text-lg text-gray-300 leading-relaxed"
+                className="mb-6 sm:mb-8 text-base sm:text-lg text-gray-300 leading-relaxed"
                 style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
               >
                 Acts as the central user profile repository for the entire
@@ -221,12 +236,12 @@ const App = () => {
               />
             </div>
 
-            {/* Event Service */}
-            <div className="bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm rounded-3xl p-10 border border-slate-700/50 shadow-2xl hover:border-green-500/30 transition-all duration-300">
-              <div className="flex items-center gap-4 mb-6">
-                <span className="text-5xl font-black text-green-400">03</span>
+            {/* Event Service (Applied responsiveness to p and h3) */}
+            <div className="bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm rounded-3xl p-6 sm:p-10 border border-slate-700/50 shadow-2xl hover:border-green-500/30 transition-all duration-300">
+              <div className="flex items-center gap-4 mb-4 sm:mb-6">
+                <span className="text-4xl sm:text-5xl font-black text-green-400">03</span>
                 <h3
-                  className="text-3xl font-bold text-green-300"
+                  className="text-2xl sm:text-3xl font-bold text-green-300"
                   style={{
                     fontFamily:
                       "'Inter', 'SF Pro Display', system-ui, sans-serif",
@@ -236,7 +251,7 @@ const App = () => {
                 </h3>
               </div>
               <p
-                className="mb-8 text-lg text-gray-300 leading-relaxed"
+                className="mb-6 sm:mb-8 text-base sm:text-lg text-gray-300 leading-relaxed"
                 style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
               >
                 Handles the creation and scheduling of sporting events by
@@ -251,12 +266,12 @@ const App = () => {
               />
             </div>
 
-            {/* Auction Service */}
-            <div className="bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm rounded-3xl p-10 border border-slate-700/50 shadow-2xl hover:border-yellow-500/30 transition-all duration-300">
-              <div className="flex items-center gap-4 mb-6">
-                <span className="text-5xl font-black text-yellow-400">04</span>
+            {/* Auction Service (Applied responsiveness to p and h3) */}
+            <div className="bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm rounded-3xl p-6 sm:p-10 border border-slate-700/50 shadow-2xl hover:border-yellow-500/30 transition-all duration-300">
+              <div className="flex items-center gap-4 mb-4 sm:mb-6">
+                <span className="text-4xl sm:text-5xl font-black text-yellow-400">04</span>
                 <h3
-                  className="text-3xl font-bold text-yellow-300"
+                  className="text-2xl sm:text-3xl font-bold text-yellow-300"
                   style={{
                     fontFamily:
                       "'Inter', 'SF Pro Display', system-ui, sans-serif",
@@ -266,7 +281,7 @@ const App = () => {
                 </h3>
               </div>
               <p
-                className="mb-8 text-lg text-gray-300 leading-relaxed"
+                className="mb-6 sm:mb-8 text-base sm:text-lg text-gray-300 leading-relaxed"
                 style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
               >
                 Consumes participant messages from RabbitMQ and is responsible
@@ -281,12 +296,12 @@ const App = () => {
               />
             </div>
 
-            {/* Live Score Service */}
-            <div className="bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm rounded-3xl p-10 border border-slate-700/50 shadow-2xl hover:border-red-500/30 transition-all duration-300">
-              <div className="flex items-center gap-4 mb-6">
-                <span className="text-5xl font-black text-red-400">05</span>
+            {/* Live Score Service (Applied responsiveness to p and h3) */}
+            <div className="bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm rounded-3xl p-6 sm:p-10 border border-slate-700/50 shadow-2xl hover:border-red-500/30 transition-all duration-300">
+              <div className="flex items-center gap-4 mb-4 sm:mb-6">
+                <span className="text-4xl sm:text-5xl font-black text-red-400">05</span>
                 <h3
-                  className="text-3xl font-bold text-red-300"
+                  className="text-2xl sm:text-3xl font-bold text-red-300"
                   style={{
                     fontFamily:
                       "'Inter', 'SF Pro Display', system-ui, sans-serif",
@@ -296,7 +311,7 @@ const App = () => {
                 </h3>
               </div>
               <p
-                className="mb-8 text-lg text-gray-300 leading-relaxed"
+                className="mb-6 sm:mb-8 text-base sm:text-lg text-gray-300 leading-relaxed"
                 style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
               >
                 Provides real-time score updates for ongoing matches, relying on
@@ -312,12 +327,12 @@ const App = () => {
               />
             </div>
 
-            {/* RAG Agent Service */}
-            <div className="bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm rounded-3xl p-10 border border-slate-700/50 shadow-2xl hover:border-cyan-500/30 transition-all duration-300">
-              <div className="flex items-center gap-4 mb-6">
-                <span className="text-5xl font-black text-cyan-400">06</span>
+            {/* RAG Agent Service (Applied responsiveness to p and h3) */}
+            <div className="bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm rounded-3xl p-6 sm:p-10 border border-slate-700/50 shadow-2xl hover:border-cyan-500/30 transition-all duration-300">
+              <div className="flex items-center gap-4 mb-4 sm:mb-6">
+                <span className="text-4xl sm:text-5xl font-black text-cyan-400">06</span>
                 <h3
-                  className="text-3xl font-bold text-cyan-300"
+                  className="text-2xl sm:text-3xl font-bold text-cyan-300"
                   style={{
                     fontFamily:
                       "'Inter', 'SF Pro Display', system-ui, sans-serif",
@@ -327,7 +342,7 @@ const App = () => {
                 </h3>
               </div>
               <p
-                className="mb-8 text-lg text-gray-300 leading-relaxed"
+                className="mb-6 sm:mb-8 text-base sm:text-lg text-gray-300 leading-relaxed"
                 style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
               >
                 Acts as a Q&A layer for the entire system, using LangChain and
@@ -342,11 +357,12 @@ const App = () => {
               />
             </div>
 
-            <div className="bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm rounded-3xl p-10 border border-slate-700/50 shadow-2xl hover:border-cyan-500/30 transition-all duration-300">
-              <div className="flex items-center gap-4 mb-6">
-                <span className="text-5xl font-black text-cyan-400">06</span>
+            {/* Deployment-side (Applied responsiveness to p and h3) */}
+            <div className="bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm rounded-3xl p-6 sm:p-10 border border-slate-700/50 shadow-2xl hover:border-cyan-500/30 transition-all duration-300">
+              <div className="flex items-center gap-4 mb-4 sm:mb-6">
+                <span className="text-4xl sm:text-5xl font-black text-cyan-400">07</span> {/* Updated index for clarity */}
                 <h3
-                  className="text-3xl font-bold text-cyan-300"
+                  className="text-2xl sm:text-3xl font-bold text-cyan-300"
                   style={{
                     fontFamily:
                       "'Inter', 'SF Pro Display', system-ui, sans-serif",
@@ -356,7 +372,7 @@ const App = () => {
                 </h3>
               </div>
               <p
-                className="mb-8 text-lg text-gray-300 leading-relaxed"
+                className="mb-6 sm:mb-8 text-base sm:text-lg text-gray-300 leading-relaxed"
                 style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
               >
                 Microservices deployment is handled by Docker for
@@ -376,9 +392,10 @@ const App = () => {
         </section>
 
         {/* Tech Stack */}
-        <section className="mb-24 w-full max-w-5xl text-center mx-auto">
+        <section className="mb-16 sm:mb-24 w-full max-w-5xl text-center mx-auto px-2">
           <h2
-            className="text-5xl font-bold mb-12 bg-gradient-to-r from-orange-300 to-rose-400 text-transparent bg-clip-text"
+            // Reduced font size on mobile (text-4xl)
+            className="text-4xl sm:text-5xl font-bold mb-8 sm:mb-12 bg-gradient-to-r from-orange-300 to-rose-400 text-transparent bg-clip-text"
             style={{
               fontFamily: "'Inter', 'SF Pro Display', system-ui, sans-serif",
             }}
@@ -387,7 +404,8 @@ const App = () => {
           </h2>
 
           <div
-            className="grid gap-8 text-left grid-cols-1 md:grid-cols-2 lg:grid-cols-2 mx-auto" // <-- ADDED grid-cols-* and mx-auto for centering
+            // Changed to a single column on mobile, then 2 columns from 'md'
+            className="grid gap-8 text-left grid-cols-1 md:grid-cols-2 mx-auto"
             style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
           >
             {[
@@ -468,23 +486,23 @@ const App = () => {
               },
             ].map((item, idx) => (
               <div key={idx} className="text-gray-300">
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-sm">
+                <div className="flex items-start gap-3 sm:gap-4">
+                  <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-xs sm:text-sm">
                     {idx + 1}
                   </div>
                   <div className="flex-1">
-                    <div className="flex items-baseline gap-2 mb-1">
-                      <span className="font-bold text-lg text-yellow-300">
+                    <div className="flex flex-wrap items-baseline gap-1 sm:gap-2 mb-1">
+                      <span className="font-bold text-base sm:text-lg text-yellow-300">
                         {item.tech}
                       </span>
-                      <span className="text-sm text-white">
+                      <span className="text-xs sm:text-sm text-white">
                         for {item.services}
                       </span>
-                      <span className="text-purple-300 font-semibold">
+                      <span className="text-purple-300 font-semibold text-sm">
                         Why?
                       </span>
                     </div>
-                    <p className="text-gray-400 text-base">{item.why}</p>
+                    <p className="text-gray-400 text-sm sm:text-base">{item.why}</p>
                   </div>
                 </div>
               </div>
@@ -492,82 +510,84 @@ const App = () => {
           </div>
         </section>
 
+        {/* Connect with the Developer (Applied responsiveness to p and h2) */}
         <section
-      className="mb-24 w-full max-w-2xl mx-auto p-6 bg-gray-800 rounded-lg shadow-xl flex flex-col items-center justify-center space-y-6"
-      style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
-    >
-      {/* Optional: Add a section title if desired */}
-      <h2 className="text-4xl font-bold text-center text-blue-300">
-        Connect with the Developer
-      </h2>
+          className="mb-16 sm:mb-24 w-full max-w-2xl mx-auto p-4 sm:p-6 bg-gray-800 rounded-lg shadow-xl flex flex-col items-center justify-center space-y-4 sm:space-y-6"
+          style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
+        >
+          {/* Optional: Add a section title if desired */}
+          <h2 className="text-3xl sm:text-4xl font-bold text-center text-blue-300">
+            Connect with the Developer
+          </h2>
 
-      <div className="text-center space-y-3">
-        {/* Full Documentation Link */}
-        <p className="text-lg">
-          <a
-            href="https://github.com/kaustubhduse/SportSync/blob/main/README.md"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-400 hover:text-blue-200 font-semibold underline transition-colors duration-200"
-          >
-            View Full Project Documentation (README.md)
-          </a>
-        </p>
+          <div className="text-center space-y-3">
+            {/* Full Documentation Link */}
+            <p className="text-base sm:text-lg">
+              <a
+                href="https://github.com/kaustubhduse/SportSync/blob/main/README.md"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-400 hover:text-blue-200 font-semibold underline transition-colors duration-200"
+              >
+                View Full Project Documentation (README.md)
+              </a>
+            </p>
 
-        {/* LinkedIn */}
-        <p className="text-lg text-gray-300">
-          LinkedIn:{" "}
-          <a
-            href="https://www.linkedin.com/in/kaustubh-duse-75a531254/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-400 hover:text-blue-200 underline transition-colors duration-200"
-          >
-            kaustubh-duse
-          </a>
-        </p>
+            {/* LinkedIn */}
+            <p className="text-base sm:text-lg text-gray-300">
+              LinkedIn:{" "}
+              <a
+                href="https://www.linkedin.com/in/kaustubh-duse-75a531254/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-400 hover:text-blue-200 underline transition-colors duration-200"
+              >
+                kaustubh-duse
+              </a>
+            </p>
 
-        {/* GitHub */}
-        <p className="text-lg text-gray-300">
-          GitHub:{" "}
-          <a
-            href="https://github.com/kaustubhduse"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-400 hover:text-blue-200 underline transition-colors duration-200"
-          >
-            kaustubhduse
-          </a>
-        </p>
-        <p className="text-lg text-gray-300">
-          Gmail:{" "}
-          <a
-            href="mailto:kaustubhduse2004@gmail.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-400 hover:text-blue-200 underline transition-colors duration-200"
-          >
-            kaustubhduse2004@gmail.com
-          </a>
-        </p>
+            {/* GitHub */}
+            <p className="text-base sm:text-lg text-gray-300">
+              GitHub:{" "}
+              <a
+                href="https://github.com/kaustubhduse"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-400 hover:text-blue-200 underline transition-colors duration-200"
+              >
+                kaustubhduse
+              </a>
+            </p>
+            <p className="text-base sm:text-lg text-gray-300">
+              Gmail:{" "}
+              <a
+                href="mailto:kaustubhduse2004@gmail.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-400 hover:text-blue-200 underline transition-colors duration-200"
+              >
+                kaustubhduse2004@gmail.com
+              </a>
+            </p>
 
-        {/* Name and Phone */}
-        <div className="pt-4 border-t border-gray-700 mt-4"> {/* Separator line */}
-          <p className="text-xl text-white font-semibold">
-            Developed by Kaustubh Duse
-          </p>
-          <p className="text-gray-400 text-base">9321992789</p>
-        </div>
-      </div>
-    </section>
+            {/* Name and Phone */}
+            <div className="pt-3 sm:pt-4 border-t border-gray-700 mt-3 sm:mt-4"> {/* Separator line */}
+              <p className="text-lg sm:text-xl text-white font-semibold">
+                Developed by Kaustubh Duse
+              </p>
+              <p className="text-gray-400 text-sm sm:text-base">9321992789</p>
+            </div>
+          </div>
+        </section>
+
 
         {/* Footer */}
         <footer
-          className="text-gray-600 mt-16 text-center pb-12"
+          className="text-gray-600 mt-10 sm:mt-16 text-center pb-8 sm:pb-12"
           style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
         >
-          <div className="w-16 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mx-auto mb-4"></div>
-          <p className="text-lg">&copy; 2025 SportsSync</p>
+          <div className="w-12 sm:w-16 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mx-auto mb-4"></div>
+          <p className="text-base sm:text-lg">&copy; 2025 SportsSync</p>
         </footer>
       </div>
     </div>
