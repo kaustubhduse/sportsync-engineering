@@ -134,7 +134,7 @@ const App = () => {
     const handleSwipe = () => {
       // Only allow swipe navigation when zoom is at 100%
       if (zoomLevel !== 1) return;
-      
+
       const swipeThreshold = 50;
       const diff = touchStartX - touchEndX;
 
@@ -309,12 +309,12 @@ const App = () => {
         const currentY = e.touches[0].clientY;
         const deltaX = currentX - lastTouchX;
         const deltaY = currentY - lastTouchY;
-        
+
         setImagePosition((prev) => ({
           x: prev.x + deltaX,
           y: prev.y + deltaY,
         }));
-        
+
         lastTouchX = currentX;
         lastTouchY = currentY;
       }
@@ -325,8 +325,12 @@ const App = () => {
     };
 
     const container = imageContainerRef.current;
-    container.addEventListener("touchstart", handleTouchStart, { passive: false });
-    container.addEventListener("touchmove", handleTouchMove, { passive: false });
+    container.addEventListener("touchstart", handleTouchStart, {
+      passive: false,
+    });
+    container.addEventListener("touchmove", handleTouchMove, {
+      passive: false,
+    });
     container.addEventListener("touchend", handleTouchEnd);
 
     return () => {
@@ -479,7 +483,10 @@ const App = () => {
                 className="glass-dark w-9 h-9 md:w-11 md:h-11 rounded-lg flex items-center justify-center hover:bg-white/10 transition-all group flex-shrink-0"
                 aria-label="Close"
               >
-                <X size={20} className="md:w-6 md:h-6 group-hover:rotate-90 transition-transform" />
+                <X
+                  size={20}
+                  className="md:w-6 md:h-6 group-hover:rotate-90 transition-transform"
+                />
               </button>
             </div>
           </div>
@@ -530,7 +537,9 @@ const App = () => {
                     resetZoom();
                   }}
                   className={`relative flex-shrink-0 transition-all duration-200 snap-center ${
-                    idx === currentImageIndex ? "scale-110" : "opacity-60 hover:opacity-100 scale-95"
+                    idx === currentImageIndex
+                      ? "scale-110"
+                      : "opacity-60 hover:opacity-100 scale-95"
                   }`}
                 >
                   <div
@@ -540,7 +549,11 @@ const App = () => {
                         : "border-white/20"
                     }`}
                   >
-                    <img src={img.src} alt={img.title} className="w-full h-full object-cover" />
+                    <img
+                      src={img.src}
+                      alt={img.title}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   {idx === currentImageIndex && (
                     <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2/3 h-1 bg-white rounded-full"></div>
@@ -558,7 +571,10 @@ const App = () => {
               className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-14 md:h-14 glass-dark rounded-lg md:rounded-xl flex items-center justify-center hover:bg-white/10 transition-all group"
               aria-label="Previous"
             >
-              <ChevronLeft size={20} className="md:w-7 md:h-7 group-hover:-translate-x-1 transition-transform" />
+              <ChevronLeft
+                size={20}
+                className="md:w-7 md:h-7 group-hover:-translate-x-1 transition-transform"
+              />
             </button>
 
             <button
@@ -566,7 +582,10 @@ const App = () => {
               className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-14 md:h-14 glass-dark rounded-lg md:rounded-xl flex items-center justify-center hover:bg-white/10 transition-all group"
               aria-label="Next"
             >
-              <ChevronRight size={20} className="md:w-7 md:h-7 group-hover:translate-x-1 transition-transform" />
+              <ChevronRight
+                size={20}
+                className="md:w-7 md:h-7 group-hover:translate-x-1 transition-transform"
+              />
             </button>
 
             {/* Zoom Controls - Desktop Right Side */}
@@ -577,7 +596,10 @@ const App = () => {
                 className="glass-dark w-10 h-10 md:w-11 md:h-11 rounded-lg flex items-center justify-center hover:bg-white/10 transition-all disabled:opacity-30 group"
                 aria-label="Zoom in"
               >
-                <ZoomIn size={18} className="md:w-5 md:h-5 group-hover:scale-110 transition-transform" />
+                <ZoomIn
+                  size={18}
+                  className="md:w-5 md:h-5 group-hover:scale-110 transition-transform"
+                />
               </button>
 
               <div className="glass-dark px-3 py-2.5 rounded-lg text-xs font-mono flex items-center justify-center min-w-[3rem]">
@@ -590,7 +612,10 @@ const App = () => {
                 className="glass-dark w-10 h-10 md:w-11 md:h-11 rounded-lg flex items-center justify-center hover:bg-white/10 transition-all disabled:opacity-30 group"
                 aria-label="Zoom out"
               >
-                <ZoomOut size={18} className="md:w-5 md:h-5 group-hover:scale-110 transition-transform" />
+                <ZoomOut
+                  size={18}
+                  className="md:w-5 md:h-5 group-hover:scale-110 transition-transform"
+                />
               </button>
 
               <button
@@ -599,7 +624,10 @@ const App = () => {
                 className="glass-dark w-10 h-10 md:w-11 md:h-11 rounded-lg flex items-center justify-center hover:bg-white/10 transition-all disabled:opacity-30 group"
                 aria-label="Reset"
               >
-                <Maximize2 size={16} className="md:w-4 md:h-4 group-hover:scale-110 transition-transform" />
+                <Maximize2
+                  size={16}
+                  className="md:w-4 md:h-4 group-hover:scale-110 transition-transform"
+                />
               </button>
             </div>
 
@@ -608,7 +636,12 @@ const App = () => {
               ref={imageContainerRef}
               className="absolute inset-0 flex items-center justify-center p-2 md:p-4 overflow-hidden touch-none"
               style={{
-                cursor: zoomLevel > 1 ? (isDragging ? "grabbing" : "grab") : "default",
+                cursor:
+                  zoomLevel > 1
+                    ? isDragging
+                      ? "grabbing"
+                      : "grab"
+                    : "default",
               }}
             >
               <img
@@ -616,7 +649,9 @@ const App = () => {
                 alt={architectureImages[currentImageIndex].title}
                 className="max-w-full max-h-full object-contain rounded-lg transition-transform duration-200 select-none"
                 style={{
-                  transform: `scale(${zoomLevel}) translate(${imagePosition.x / zoomLevel}px, ${imagePosition.y / zoomLevel}px)`,
+                  transform: `scale(${zoomLevel}) translate(${
+                    imagePosition.x / zoomLevel
+                  }px, ${imagePosition.y / zoomLevel}px)`,
                   transformOrigin: "center center",
                 }}
                 onMouseDown={handleMouseDown}
@@ -700,7 +735,9 @@ const App = () => {
 
             <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
               <div className="glass-dark p-6 sm:p-8 md:p-12 rounded-2xl">
-                <h3 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">The Problem</h3>
+                <h3 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">
+                  The Problem
+                </h3>
                 <p className="text-gray-400 leading-relaxed text-sm sm:text-base md:text-lg">
                   During sports auctions at our institute, the excitement was
                   real, but so was the confusion. Volunteers tried to track
@@ -711,7 +748,9 @@ const App = () => {
               </div>
 
               <div className="glass-dark p-6 sm:p-8 md:p-12 rounded-2xl">
-                <h3 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">The Solution</h3>
+                <h3 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">
+                  The Solution
+                </h3>
                 <p className="text-gray-400 leading-relaxed text-sm sm:text-base md:text-lg">
                   SportsSync creates a centralized platform for managing sports
                   auctions efficiently. It ensures complete transparency by
@@ -725,7 +764,10 @@ const App = () => {
         </section>
 
         {/* Architecture Diagram */}
-        <section id="architecture" className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 bg-neutral-950/50">
+        <section
+          id="architecture"
+          className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 bg-neutral-950/50"
+        >
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-10 sm:mb-16">
               <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 sm:mb-6">
@@ -781,7 +823,9 @@ const App = () => {
                         <span className="text-xs sm:text-sm font-mono text-gray-500">
                           01
                         </span>
-                        <h3 className="text-xl sm:text-2xl md:text-3xl font-bold">Auth Service</h3>
+                        <h3 className="text-xl sm:text-2xl md:text-3xl font-bold">
+                          Auth Service
+                        </h3>
                       </div>
                       <p className="text-sm sm:text-base md:text-lg text-gray-400 leading-relaxed">
                         Manages user sign-up, login, and Google OAuth 2.0
@@ -839,7 +883,9 @@ const App = () => {
                         <span className="text-xs sm:text-sm font-mono text-gray-500">
                           02
                         </span>
-                        <h3 className="text-xl sm:text-2xl md:text-3xl font-bold">User Service</h3>
+                        <h3 className="text-xl sm:text-2xl md:text-3xl font-bold">
+                          User Service
+                        </h3>
                       </div>
                       <p className="text-sm sm:text-base md:text-lg text-gray-400 leading-relaxed">
                         Central user profile repository storing basic user data
@@ -881,7 +927,9 @@ const App = () => {
                         <span className="text-xs sm:text-sm font-mono text-gray-500">
                           03
                         </span>
-                        <h3 className="text-xl sm:text-2xl md:text-3xl font-bold">Event Service</h3>
+                        <h3 className="text-xl sm:text-2xl md:text-3xl font-bold">
+                          Event Service
+                        </h3>
                       </div>
                       <p className="text-sm sm:text-base md:text-lg text-gray-400 leading-relaxed">
                         Handles creation and scheduling of sporting events.
@@ -924,7 +972,9 @@ const App = () => {
                         <span className="text-xs sm:text-sm font-mono text-gray-500">
                           04
                         </span>
-                        <h3 className="text-xl sm:text-2xl md:text-3xl font-bold">Auction Service</h3>
+                        <h3 className="text-xl sm:text-2xl md:text-3xl font-bold">
+                          Auction Service
+                        </h3>
                       </div>
                       <p className="text-sm sm:text-base md:text-lg text-gray-400 leading-relaxed">
                         Consumes participant messages from RabbitMQ for live
@@ -1072,7 +1122,9 @@ const App = () => {
                         <span className="text-xs sm:text-sm font-mono text-gray-500">
                           07
                         </span>
-                        <h3 className="text-xl sm:text-2xl md:text-3xl font-bold">Deployment</h3>
+                        <h3 className="text-xl sm:text-2xl md:text-3xl font-bold">
+                          Deployment
+                        </h3>
                       </div>
                       <p className="text-sm sm:text-base md:text-lg text-gray-400 leading-relaxed">
                         Deployment handled by Docker and orchestrated by AWS
@@ -1107,7 +1159,10 @@ const App = () => {
         </section>
 
         {/* Tech Stack */}
-        <section id="stack" className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 bg-neutral-950/50">
+        <section
+          id="stack"
+          className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 bg-neutral-950/50"
+        >
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-12 sm:mb-16 md:mb-20">
               <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 sm:mb-6">
@@ -1221,7 +1276,9 @@ const App = () => {
                   >
                     <item.icon className={`text-${item.color}-400`} size={20} />
                   </div>
-                  <h3 className="text-lg sm:text-xl font-semibold mb-1 sm:mb-2">{item.name}</h3>
+                  <h3 className="text-lg sm:text-xl font-semibold mb-1 sm:mb-2">
+                    {item.name}
+                  </h3>
                   <p className="text-gray-400 text-xs sm:text-sm leading-relaxed">
                     {item.purpose}
                   </p>
@@ -1232,7 +1289,10 @@ const App = () => {
         </section>
 
         {/* Contact Section */}
-        <section id="contact" className="py-12 sm:py-16 md:py-24 lg:py-32 px-4 sm:px-6">
+        <section
+          id="contact"
+          className="py-12 sm:py-16 md:py-24 lg:py-32 px-4 sm:px-6"
+        >
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-8 sm:mb-10 md:mb-16">
               <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 sm:mb-4 md:mb-6">
@@ -1246,8 +1306,12 @@ const App = () => {
 
             <div className="glass-dark p-4 sm:p-6 md:p-8 lg:p-12 rounded-xl sm:rounded-2xl border border-white/5">
               <div className="text-center mb-8 sm:mb-10 md:mb-12">
-                <h3 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">Kaustubh Duse</h3>
-                <p className="text-sm sm:text-base text-gray-400">Full Stack Developer</p>
+                <h3 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">
+                  Kaustubh Duse
+                </h3>
+                <p className="text-sm sm:text-base text-gray-400">
+                  Full Stack Developer
+                </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
@@ -1261,10 +1325,17 @@ const App = () => {
                     <Github size={20} className="sm:w-5 sm:h-5 md:w-6 md:h-6" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-xs sm:text-sm text-gray-400">GitHub</div>
-                    <div className="font-medium text-sm sm:text-base truncate">kaustubhduse</div>
+                    <div className="text-xs sm:text-sm text-gray-400">
+                      GitHub
+                    </div>
+                    <div className="font-medium text-sm sm:text-base truncate">
+                      kaustubhduse
+                    </div>
                   </div>
-                  <ExternalLink size={14} className="sm:w-4 sm:h-4 text-gray-400 flex-shrink-0" />
+                  <ExternalLink
+                    size={14}
+                    className="sm:w-4 sm:h-4 text-gray-400 flex-shrink-0"
+                  />
                 </a>
 
                 <a
@@ -1274,13 +1345,23 @@ const App = () => {
                   className="flex items-center gap-3 sm:gap-4 p-4 sm:p-5 md:p-6 glass rounded-lg sm:rounded-xl hover:bg-white/10 transition-all group"
                 >
                   <div className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-white/5 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform flex-shrink-0">
-                    <Linkedin size={20} className="sm:w-5 sm:h-5 md:w-6 md:h-6" />
+                    <Linkedin
+                      size={20}
+                      className="sm:w-5 sm:h-5 md:w-6 md:h-6"
+                    />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-xs sm:text-sm text-gray-400">LinkedIn</div>
-                    <div className="font-medium text-sm sm:text-base truncate">kaustubh-duse</div>
+                    <div className="text-xs sm:text-sm text-gray-400">
+                      LinkedIn
+                    </div>
+                    <div className="font-medium text-sm sm:text-base truncate">
+                      kaustubh-duse
+                    </div>
                   </div>
-                  <ExternalLink size={14} className="sm:w-4 sm:h-4 text-gray-400 flex-shrink-0" />
+                  <ExternalLink
+                    size={14}
+                    className="sm:w-4 sm:h-4 text-gray-400 flex-shrink-0"
+                  />
                 </a>
 
                 <a
@@ -1291,7 +1372,9 @@ const App = () => {
                     <Mail size={20} className="sm:w-5 sm:h-5 md:w-6 md:h-6" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-xs sm:text-sm text-gray-400">Email</div>
+                    <div className="text-xs sm:text-sm text-gray-400">
+                      Email
+                    </div>
                     <div className="font-medium text-sm sm:text-base truncate">
                       kaustubhduse2004@gmail.com
                     </div>
@@ -1306,8 +1389,12 @@ const App = () => {
                     <Phone size={20} className="sm:w-5 sm:h-5 md:w-6 md:h-6" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-xs sm:text-sm text-gray-400">Phone</div>
-                    <div className="font-medium text-sm sm:text-base">+91 9321992789</div>
+                    <div className="text-xs sm:text-sm text-gray-400">
+                      Phone
+                    </div>
+                    <div className="font-medium text-sm sm:text-base">
+                      +91 9321992789
+                    </div>
                   </div>
                 </a>
               </div>
