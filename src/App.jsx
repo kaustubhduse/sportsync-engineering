@@ -115,7 +115,7 @@ const App = () => {
     return () => window.removeEventListener("keydown", handleKeyPress);
   }, [lightboxOpen, currentImageIndex]);
 
-  // Touch/Swipe support for mobile
+  // Touch/Swipe support for mobile - only when not zoomed
   useEffect(() => {
     if (!lightboxOpen) return;
 
@@ -132,6 +132,9 @@ const App = () => {
     };
 
     const handleSwipe = () => {
+      // Only allow swipe navigation when zoom is at 100%
+      if (zoomLevel !== 1) return;
+      
       const swipeThreshold = 50;
       const diff = touchStartX - touchEndX;
 
@@ -153,7 +156,7 @@ const App = () => {
       window.removeEventListener("touchstart", handleTouchStart);
       window.removeEventListener("touchend", handleTouchEnd);
     };
-  }, [lightboxOpen, currentImageIndex]);
+  }, [lightboxOpen, currentImageIndex, zoomLevel]);
 
   const openLightbox = (imageSrc) => {
     const index = architectureImages.findIndex((img) => img.src === imageSrc);
@@ -253,12 +256,17 @@ const App = () => {
     setIsDragging(false);
   };
 
-  // Touch pinch zoom
+  // Enhanced Touch handling for mobile - Pinch zoom & Pan
   useEffect(() => {
     if (!lightboxOpen || !imageContainerRef.current) return;
 
     let initialDistance = 0;
     let initialZoom = 1;
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let lastTouchX = 0;
+    let lastTouchY = 0;
+    let isPanning = false;
 
     const getDistance = (touches) => {
       const dx = touches[0].clientX - touches[1].clientX;
@@ -268,14 +276,24 @@ const App = () => {
 
     const handleTouchStart = (e) => {
       if (e.touches.length === 2) {
+        // Two finger pinch zoom
         e.preventDefault();
         initialDistance = getDistance(e.touches);
         initialZoom = zoomLevel;
+        isPanning = false;
+      } else if (e.touches.length === 1 && zoomLevel > 1) {
+        // Single finger pan when zoomed
+        isPanning = true;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        lastTouchX = touchStartX;
+        lastTouchY = touchStartY;
       }
     };
 
     const handleTouchMove = (e) => {
       if (e.touches.length === 2) {
+        // Pinch zoom
         e.preventDefault();
         const currentDistance = getDistance(e.touches);
         const scale = currentDistance / initialDistance;
@@ -284,20 +302,37 @@ const App = () => {
         if (newZoom === 1) {
           setImagePosition({ x: 0, y: 0 });
         }
+      } else if (e.touches.length === 1 && isPanning && zoomLevel > 1) {
+        // Pan
+        e.preventDefault();
+        const currentX = e.touches[0].clientX;
+        const currentY = e.touches[0].clientY;
+        const deltaX = currentX - lastTouchX;
+        const deltaY = currentY - lastTouchY;
+        
+        setImagePosition((prev) => ({
+          x: prev.x + deltaX,
+          y: prev.y + deltaY,
+        }));
+        
+        lastTouchX = currentX;
+        lastTouchY = currentY;
       }
     };
 
+    const handleTouchEnd = () => {
+      isPanning = false;
+    };
+
     const container = imageContainerRef.current;
-    container.addEventListener("touchstart", handleTouchStart, {
-      passive: false,
-    });
-    container.addEventListener("touchmove", handleTouchMove, {
-      passive: false,
-    });
+    container.addEventListener("touchstart", handleTouchStart, { passive: false });
+    container.addEventListener("touchmove", handleTouchMove, { passive: false });
+    container.addEventListener("touchend", handleTouchEnd);
 
     return () => {
       container.removeEventListener("touchstart", handleTouchStart);
       container.removeEventListener("touchmove", handleTouchMove);
+      container.removeEventListener("touchend", handleTouchEnd);
     };
   }, [lightboxOpen, zoomLevel]);
 
@@ -307,7 +342,7 @@ const App = () => {
   };
 
   return (
-    <div className="bg-black text-white min-h-screen relative">
+    <div className="bg-black text-white min-h-screen relative overflow-x-hidden w-full">
       {/* Subtle gradient overlay - minimal */}
       <div className="fixed inset-0 bg-gradient-to-br from-neutral-950 via-black to-neutral-950 pointer-events-none opacity-60"></div>
 
@@ -317,15 +352,15 @@ const App = () => {
           scrollY > 50 ? "glass-dark shadow-lg" : ""
         }`}
       >
-        <div className="max-w-7xl mx-auto px-6 py-4">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 md:gap-3">
               <img
                 src="sportsync_logo.jpg"
                 alt="Logo"
-                className="w-10 h-10 rounded-full ring-2 ring-white/10"
+                className="w-8 h-8 md:w-10 md:h-10 rounded-full ring-2 ring-white/10"
               />
-              <span className="text-xl font-semibold tracking-tight">
+              <span className="text-sm md:text-xl font-semibold tracking-tight whitespace-nowrap">
                 SportsSync Engineering
               </span>
             </div>
@@ -411,174 +446,177 @@ const App = () => {
         </div>
       </nav>
 
-      {/* Image Lightbox Modal - Advanced with Zoom */}
+      {/* Image Lightbox Modal - Mobile Optimized */}
       {lightboxOpen && (
         <div
-          className="fixed inset-0 z-[100] bg-black/98 backdrop-blur-xl"
+          className="fixed inset-0 z-[100] bg-black/98 backdrop-blur-xl flex flex-col"
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
         >
-          {/* Floating Thumbnail Carousel at Top */}
-          <div className="absolute top-0 left-0 right-0 z-20 glass-dark border-b border-white/5">
-            <div className="max-w-7xl mx-auto px-4 py-3">
-              <div className="flex gap-2 overflow-x-auto scrollbar-thin">
-                {architectureImages.map((img, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => {
-                      setCurrentImageIndex(idx);
-                      resetZoom();
-                    }}
-                    className={`relative flex-shrink-0 group transition-all duration-300 ${
-                      idx === currentImageIndex
-                        ? "scale-105"
-                        : "opacity-60 hover:opacity-100"
-                    }`}
-                  >
-                    <div
-                      className={`w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden border-2 transition-all ${
-                        idx === currentImageIndex
-                          ? "border-white shadow-lg shadow-white/20"
-                          : "border-white/10 hover:border-white/30"
-                      }`}
-                    >
-                      <img
-                        src={img.src}
-                        alt={img.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    {idx === currentImageIndex && (
-                      <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1/2 h-0.5 bg-white rounded-full"></div>
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Top Controls Bar */}
-          <div className="absolute top-24 left-4 right-4 z-20 flex items-center justify-between">
-            {/* Title & Counter */}
-            <div className="glass-dark px-4 py-2 rounded-xl max-w-md">
-              <div className="flex items-center gap-3">
-                <span className="text-xs font-mono text-gray-400">
+          {/* Top Bar: Title, Counter, Close */}
+          <div className="flex-shrink-0 glass-dark border-b border-white/5 px-3 py-3 md:px-6 md:py-4">
+            <div className="flex items-center justify-between gap-3">
+              {/* Counter & Title */}
+              <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
+                <span className="text-xs md:text-sm font-mono text-gray-400 whitespace-nowrap">
                   {currentImageIndex + 1}/{architectureImages.length}
                 </span>
-                <div className="w-px h-4 bg-white/20"></div>
-                <div>
-                  <h3 className="text-sm md:text-base font-semibold">
+                <div className="w-px h-4 bg-white/20 hidden sm:block"></div>
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-sm md:text-lg font-semibold truncate">
                     {architectureImages[currentImageIndex].title}
                   </h3>
-                  <p className="text-xs text-gray-400 hidden md:block">
+                  <p className="text-xs text-gray-400 hidden md:block truncate">
                     {architectureImages[currentImageIndex].description}
                   </p>
                 </div>
               </div>
-            </div>
 
-            {/* Close Button */}
-            <button
-              onClick={closeLightbox}
-              className="glass-dark w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center hover:bg-white/10 transition-all group"
-              aria-label="Close"
-            >
-              <X
-                size={20}
-                className="md:w-6 md:h-6 group-hover:rotate-90 transition-transform duration-300"
-              />
-            </button>
+              {/* Close Button */}
+              <button
+                onClick={closeLightbox}
+                className="glass-dark w-9 h-9 md:w-11 md:h-11 rounded-lg flex items-center justify-center hover:bg-white/10 transition-all group flex-shrink-0"
+                aria-label="Close"
+              >
+                <X size={20} className="md:w-6 md:h-6 group-hover:rotate-90 transition-transform" />
+              </button>
+            </div>
           </div>
 
-          {/* Zoom Controls - Floating on Right */}
-          <div className="absolute right-4 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-2">
-            <button
-              onClick={handleZoomIn}
-              disabled={zoomLevel >= 4}
-              className="glass-dark w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center hover:bg-white/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed group"
-              aria-label="Zoom in"
-            >
-              <ZoomIn
-                size={20}
-                className="md:w-6 md:h-6 group-hover:scale-110 transition-transform"
-              />
-            </button>
+          {/* Floating Thumbnail Carousel - Bottom Positioned for Mobile */}
+          <div className="absolute bottom-0 left-0 right-0 z-30 flex-shrink-0 glass-dark border-t border-white/5 md:relative md:border-t-0 md:border-b">
+            {/* Mobile Zoom Controls */}
+            <div className="md:hidden flex items-center justify-center gap-2 px-3 py-2 border-b border-white/5">
+              <button
+                onClick={handleZoomIn}
+                disabled={zoomLevel >= 4}
+                className="glass-dark w-9 h-9 rounded-lg flex items-center justify-center hover:bg-white/10 transition-all disabled:opacity-30"
+                aria-label="Zoom in"
+              >
+                <ZoomIn size={16} />
+              </button>
 
-            <div className="glass-dark px-2 py-1 rounded-xl text-xs font-mono text-center">
-              {Math.round(zoomLevel * 100)}%
+              <div className="glass-dark px-3 py-1.5 rounded-lg text-xs font-mono min-w-[3rem] text-center">
+                {Math.round(zoomLevel * 100)}%
+              </div>
+
+              <button
+                onClick={handleZoomOut}
+                disabled={zoomLevel <= 1}
+                className="glass-dark w-9 h-9 rounded-lg flex items-center justify-center hover:bg-white/10 transition-all disabled:opacity-30"
+                aria-label="Zoom out"
+              >
+                <ZoomOut size={16} />
+              </button>
+
+              <button
+                onClick={handleResetZoom}
+                disabled={zoomLevel === 1}
+                className="glass-dark w-9 h-9 rounded-lg flex items-center justify-center hover:bg-white/10 transition-all disabled:opacity-30"
+                aria-label="Reset"
+              >
+                <Maximize2 size={14} />
+              </button>
             </div>
 
-            <button
-              onClick={handleZoomOut}
-              disabled={zoomLevel <= 1}
-              className="glass-dark w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center hover:bg-white/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed group"
-              aria-label="Zoom out"
-            >
-              <ZoomOut
-                size={20}
-                className="md:w-6 md:h-6 group-hover:scale-110 transition-transform"
-              />
-            </button>
-
-            <button
-              onClick={handleResetZoom}
-              disabled={zoomLevel === 1}
-              className="glass-dark w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center hover:bg-white/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed group"
-              aria-label="Reset zoom"
-            >
-              <Maximize2
-                size={18}
-                className="md:w-5 md:h-5 group-hover:scale-110 transition-transform"
-              />
-            </button>
+            {/* Thumbnail List */}
+            <div className="flex gap-2 sm:gap-2.5 md:gap-3 overflow-x-auto scrollbar-thin px-3 py-3 sm:px-4 sm:py-4 snap-x snap-mandatory">
+              {architectureImages.map((img, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => {
+                    setCurrentImageIndex(idx);
+                    resetZoom();
+                  }}
+                  className={`relative flex-shrink-0 transition-all duration-200 snap-center ${
+                    idx === currentImageIndex ? "scale-110" : "opacity-60 hover:opacity-100 scale-95"
+                  }`}
+                >
+                  <div
+                    className={`w-14 h-14 sm:w-16 sm:h-16 md:w-18 md:h-18 rounded-lg overflow-hidden border-2 transition-all ${
+                      idx === currentImageIndex
+                        ? "border-white shadow-lg shadow-white/20"
+                        : "border-white/20"
+                    }`}
+                  >
+                    <img src={img.src} alt={img.title} className="w-full h-full object-cover" />
+                  </div>
+                  {idx === currentImageIndex && (
+                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2/3 h-1 bg-white rounded-full"></div>
+                  )}
+                </button>
+              ))}
+            </div>
           </div>
 
-          {/* Navigation Arrows */}
-          <button
-            onClick={() => navigateImage("prev")}
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-16 md:h-16 glass-dark rounded-xl flex items-center justify-center hover:bg-white/10 transition-all group"
-            aria-label="Previous"
-          >
-            <ChevronLeft
-              size={24}
-              className="md:w-8 md:h-8 group-hover:-translate-x-1 transition-transform"
-            />
-          </button>
+          {/* Main Image Area */}
+          <div className="flex-1 relative min-h-0 pb-24 md:pb-0">
+            {/* Navigation Arrows */}
+            <button
+              onClick={() => navigateImage("prev")}
+              className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-14 md:h-14 glass-dark rounded-lg md:rounded-xl flex items-center justify-center hover:bg-white/10 transition-all group"
+              aria-label="Previous"
+            >
+              <ChevronLeft size={20} className="md:w-7 md:h-7 group-hover:-translate-x-1 transition-transform" />
+            </button>
 
-          <button
-            onClick={() => navigateImage("next")}
-            className="absolute right-20 md:right-24 top-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-16 md:h-16 glass-dark rounded-xl flex items-center justify-center hover:bg-white/10 transition-all group"
-            aria-label="Next"
-          >
-            <ChevronRight
-              size={24}
-              className="md:w-8 md:h-8 group-hover:translate-x-1 transition-transform"
-            />
-          </button>
+            <button
+              onClick={() => navigateImage("next")}
+              className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-14 md:h-14 glass-dark rounded-lg md:rounded-xl flex items-center justify-center hover:bg-white/10 transition-all group"
+              aria-label="Next"
+            >
+              <ChevronRight size={20} className="md:w-7 md:h-7 group-hover:translate-x-1 transition-transform" />
+            </button>
 
-          {/* Main Image Container with Zoom & Pan */}
-          <div className="absolute inset-0 flex items-center justify-center pt-32 pb-8">
+            {/* Zoom Controls - Desktop Right Side */}
+            <div className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 z-20 flex-col gap-2">
+              <button
+                onClick={handleZoomIn}
+                disabled={zoomLevel >= 4}
+                className="glass-dark w-10 h-10 md:w-11 md:h-11 rounded-lg flex items-center justify-center hover:bg-white/10 transition-all disabled:opacity-30 group"
+                aria-label="Zoom in"
+              >
+                <ZoomIn size={18} className="md:w-5 md:h-5 group-hover:scale-110 transition-transform" />
+              </button>
+
+              <div className="glass-dark px-3 py-2.5 rounded-lg text-xs font-mono flex items-center justify-center min-w-[3rem]">
+                {Math.round(zoomLevel * 100)}%
+              </div>
+
+              <button
+                onClick={handleZoomOut}
+                disabled={zoomLevel <= 1}
+                className="glass-dark w-10 h-10 md:w-11 md:h-11 rounded-lg flex items-center justify-center hover:bg-white/10 transition-all disabled:opacity-30 group"
+                aria-label="Zoom out"
+              >
+                <ZoomOut size={18} className="md:w-5 md:h-5 group-hover:scale-110 transition-transform" />
+              </button>
+
+              <button
+                onClick={handleResetZoom}
+                disabled={zoomLevel === 1}
+                className="glass-dark w-10 h-10 md:w-11 md:h-11 rounded-lg flex items-center justify-center hover:bg-white/10 transition-all disabled:opacity-30 group"
+                aria-label="Reset"
+              >
+                <Maximize2 size={16} className="md:w-4 md:h-4 group-hover:scale-110 transition-transform" />
+              </button>
+            </div>
+
+            {/* Image Container */}
             <div
               ref={imageContainerRef}
-              className="relative w-full h-full flex items-center justify-center overflow-hidden"
+              className="absolute inset-0 flex items-center justify-center p-2 md:p-4 overflow-hidden touch-none"
               style={{
-                cursor:
-                  zoomLevel > 1
-                    ? isDragging
-                      ? "grabbing"
-                      : "grab"
-                    : "default",
+                cursor: zoomLevel > 1 ? (isDragging ? "grabbing" : "grab") : "default",
               }}
             >
               <img
                 src={architectureImages[currentImageIndex].src}
                 alt={architectureImages[currentImageIndex].title}
-                className="max-w-full max-h-full object-contain rounded-xl transition-transform duration-200 select-none"
+                className="max-w-full max-h-full object-contain rounded-lg transition-transform duration-200 select-none"
                 style={{
-                  transform: `scale(${zoomLevel}) translate(${
-                    imagePosition.x / zoomLevel
-                  }px, ${imagePosition.y / zoomLevel}px)`,
+                  transform: `scale(${zoomLevel}) translate(${imagePosition.x / zoomLevel}px, ${imagePosition.y / zoomLevel}px)`,
                   transformOrigin: "center center",
                 }}
                 onMouseDown={handleMouseDown}
@@ -587,14 +625,14 @@ const App = () => {
             </div>
           </div>
 
-          {/* Bottom Hint Bar */}
-          <div className="absolute bottom-0 left-0 right-0 z-20 glass-dark border-t border-white/5">
-            <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-center gap-6 text-xs text-gray-400">
-              <span className="hidden md:inline">Arrow keys: Navigate</span>
-              <span className="hidden md:inline">•</span>
+          {/* Bottom Hint - Desktop Only */}
+          <div className="hidden md:block flex-shrink-0 glass-dark border-t border-white/5 px-4 py-2">
+            <div className="flex items-center justify-center gap-3 text-xs text-gray-400">
+              <span>Arrow keys: Navigate</span>
+              <span>•</span>
               <span>Scroll/Pinch: Zoom</span>
-              <span className="hidden md:inline">•</span>
-              <span className="hidden md:inline">Drag: Pan (when zoomed)</span>
+              <span>•</span>
+              <span>Drag: Pan</span>
               <span>•</span>
               <span>ESC: Close</span>
             </div>
@@ -605,35 +643,35 @@ const App = () => {
       {/* Main Content */}
       <div className="relative z-10">
         {/* Hero Section */}
-        <section className="min-h-screen flex items-center justify-center px-6 pt-20">
-          <div className="max-w-5xl mx-auto text-center">
-            <div className="mb-8 inline-block">
+        <section className="min-h-screen flex items-center justify-center px-4 sm:px-6 pt-20">
+          <div className="max-w-5xl mx-auto text-center w-full">
+            <div className="mb-6 sm:mb-8 inline-block">
               <img
                 src="sportsync_logo.jpg"
                 alt="SportsSync"
-                className="w-32 h-32 rounded-full mx-auto ring-4 ring-white/10"
+                className="w-24 h-24 sm:w-32 sm:h-32 rounded-full mx-auto ring-4 ring-white/10"
               />
             </div>
 
-            <h1 className="text-6xl md:text-8xl font-bold tracking-tight mb-6">
+            <h1 className="text-4xl sm:text-5xl md:text-8xl font-bold tracking-tight mb-4 sm:mb-6 px-2">
               Engineering behind
               <br />
               <span className="text-gray-400">SportsSync</span>
             </h1>
 
-            <p className="text-xl md:text-2xl text-gray-400 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-base sm:text-xl md:text-2xl text-gray-400 max-w-3xl mx-auto leading-relaxed px-4">
               A scalable microservices architecture for real-time sports auction
               management
             </p>
 
-            <div className="mt-12 flex flex-wrap justify-center gap-4">
+            <div className="mt-8 sm:mt-12 flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-4 px-4">
               <a
                 href="#overview"
                 onClick={(e) => {
                   e.preventDefault();
                   scrollToSection("overview");
                 }}
-                className="px-8 py-4 bg-white text-black font-medium rounded-lg hover:bg-gray-200 transition"
+                className="px-6 sm:px-8 py-3 sm:py-4 bg-white text-black font-medium rounded-lg hover:bg-gray-200 transition text-sm sm:text-base"
               >
                 Explore Architecture
               </a>
@@ -641,9 +679,9 @@ const App = () => {
                 href="https://github.com/kaustubhduse/SportSync"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-8 py-4 glass border border-white/10 font-medium rounded-lg hover:bg-white/10 transition inline-flex items-center gap-2"
+                className="px-6 sm:px-8 py-3 sm:py-4 glass border border-white/10 font-medium rounded-lg hover:bg-white/10 transition inline-flex items-center justify-center gap-2 text-sm sm:text-base"
               >
-                <Github size={20} />
+                <Github size={18} className="sm:w-5 sm:h-5" />
                 View on GitHub
               </a>
             </div>
@@ -651,19 +689,19 @@ const App = () => {
         </section>
 
         {/* Overview Section */}
-        <section id="overview" className="py-32 px-6">
+        <section id="overview" className="py-16 sm:py-24 md:py-32 px-4 sm:px-6">
           <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-5xl md:text-6xl font-bold mb-6">
+            <div className="text-center mb-10 sm:mb-16">
+              <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 sm:mb-6">
                 The Challenge
               </h2>
-              <div className="w-20 h-1 bg-white mx-auto"></div>
+              <div className="w-16 sm:w-20 h-1 bg-white mx-auto"></div>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-8">
-              <div className="glass-dark p-12 rounded-2xl">
-                <h3 className="text-2xl font-semibold mb-4">The Problem</h3>
-                <p className="text-gray-400 leading-relaxed text-lg">
+            <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
+              <div className="glass-dark p-6 sm:p-8 md:p-12 rounded-2xl">
+                <h3 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">The Problem</h3>
+                <p className="text-gray-400 leading-relaxed text-sm sm:text-base md:text-lg">
                   During sports auctions at our institute, the excitement was
                   real, but so was the confusion. Volunteers tried to track
                   every bid, but updates were either delayed or inconsistent. By
@@ -672,9 +710,9 @@ const App = () => {
                 </p>
               </div>
 
-              <div className="glass-dark p-12 rounded-2xl">
-                <h3 className="text-2xl font-semibold mb-4">The Solution</h3>
-                <p className="text-gray-400 leading-relaxed text-lg">
+              <div className="glass-dark p-6 sm:p-8 md:p-12 rounded-2xl">
+                <h3 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">The Solution</h3>
+                <p className="text-gray-400 leading-relaxed text-sm sm:text-base md:text-lg">
                   SportsSync creates a centralized platform for managing sports
                   auctions efficiently. It ensures complete transparency by
                   displaying final bid amounts and team assignments, with data
@@ -687,21 +725,21 @@ const App = () => {
         </section>
 
         {/* Architecture Diagram */}
-        <section id="architecture" className="py-32 px-6 bg-neutral-950/50">
+        <section id="architecture" className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 bg-neutral-950/50">
           <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-5xl md:text-6xl font-bold mb-6">
+            <div className="text-center mb-10 sm:mb-16">
+              <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 sm:mb-6">
                 System Architecture
               </h2>
-              <div className="w-20 h-1 bg-white mx-auto mb-8"></div>
-              <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+              <div className="w-16 sm:w-20 h-1 bg-white mx-auto mb-6 sm:mb-8"></div>
+              <p className="text-base sm:text-lg md:text-xl text-gray-400 max-w-3xl mx-auto px-4">
                 High-level overview of the microservices architecture powering
                 SportsSync
               </p>
             </div>
 
             <div
-              className="glass-dark p-8 rounded-2xl cursor-pointer hover:border-white/20 transition-all group"
+              className="glass-dark p-4 sm:p-6 md:p-8 rounded-2xl cursor-pointer hover:border-white/20 transition-all group"
               onClick={() => openLightbox("High-level.png")}
             >
               <img
@@ -709,7 +747,7 @@ const App = () => {
                 alt="Architecture Diagram"
                 className="w-full h-auto rounded-xl group-hover:scale-[1.02] transition-transform"
               />
-              <div className="text-center mt-4 text-sm text-gray-400 group-hover:text-white transition-colors">
+              <div className="text-center mt-3 sm:mt-4 text-xs sm:text-sm text-gray-400 group-hover:text-white transition-colors">
                 Click to view full size
               </div>
             </div>
@@ -717,35 +755,35 @@ const App = () => {
         </section>
 
         {/* Microservices */}
-        <section id="services" className="py-32 px-6">
+        <section id="services" className="py-16 sm:py-24 md:py-32 px-4 sm:px-6">
           <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-20">
-              <h2 className="text-5xl md:text-6xl font-bold mb-6">
+            <div className="text-center mb-12 sm:mb-16 md:mb-20">
+              <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 sm:mb-6">
                 Microservices
               </h2>
-              <div className="w-20 h-1 bg-white mx-auto mb-8"></div>
-              <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+              <div className="w-16 sm:w-20 h-1 bg-white mx-auto mb-6 sm:mb-8"></div>
+              <p className="text-base sm:text-lg md:text-xl text-gray-400 max-w-3xl mx-auto px-4">
                 Seven specialized services working together to deliver a
                 seamless experience
               </p>
             </div>
 
-            <div className="space-y-8">
+            <div className="space-y-6 sm:space-y-8">
               {/* Auth Service */}
               <div className="glass-dark rounded-2xl overflow-hidden border border-white/5 hover:border-white/10 transition-all">
-                <div className="p-8 md:p-12">
-                  <div className="flex items-start gap-6 mb-6">
-                    <div className="flex-shrink-0 w-16 h-16 bg-blue-500/10 rounded-xl flex items-center justify-center">
-                      <Lock className="text-blue-400" size={32} />
+                <div className="p-6 sm:p-8 md:p-12">
+                  <div className="flex items-start gap-4 sm:gap-6 mb-4 sm:mb-6">
+                    <div className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-blue-500/10 rounded-xl flex items-center justify-center">
+                      <Lock className="text-blue-400" size={24} />
                     </div>
-                    <div>
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="text-sm font-mono text-gray-500">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                        <span className="text-xs sm:text-sm font-mono text-gray-500">
                           01
                         </span>
-                        <h3 className="text-3xl font-bold">Auth Service</h3>
+                        <h3 className="text-xl sm:text-2xl md:text-3xl font-bold">Auth Service</h3>
                       </div>
-                      <p className="text-lg text-gray-400 leading-relaxed">
+                      <p className="text-sm sm:text-base md:text-lg text-gray-400 leading-relaxed">
                         Manages user sign-up, login, and Google OAuth 2.0
                         integration. Issues and validates JWTs for securing all
                         other services. Stores authentication details and
@@ -754,7 +792,7 @@ const App = () => {
                     </div>
                   </div>
 
-                  <div className="grid md:grid-cols-2 gap-4 mt-8">
+                  <div className="grid md:grid-cols-2 gap-3 sm:gap-4 mt-6 sm:mt-8">
                     <div
                       className="cursor-pointer group relative"
                       onClick={() => openLightbox("Auth-service.png")}
@@ -791,19 +829,19 @@ const App = () => {
 
               {/* User Service */}
               <div className="glass-dark rounded-2xl overflow-hidden border border-white/5 hover:border-white/10 transition-all">
-                <div className="p-8 md:p-12">
-                  <div className="flex items-start gap-6 mb-6">
-                    <div className="flex-shrink-0 w-16 h-16 bg-purple-500/10 rounded-xl flex items-center justify-center">
-                      <Server className="text-purple-400" size={32} />
+                <div className="p-6 sm:p-8 md:p-12">
+                  <div className="flex items-start gap-4 sm:gap-6 mb-4 sm:mb-6">
+                    <div className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-purple-500/10 rounded-xl flex items-center justify-center">
+                      <Server className="text-purple-400" size={24} />
                     </div>
-                    <div>
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="text-sm font-mono text-gray-500">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                        <span className="text-xs sm:text-sm font-mono text-gray-500">
                           02
                         </span>
-                        <h3 className="text-3xl font-bold">User Service</h3>
+                        <h3 className="text-xl sm:text-2xl md:text-3xl font-bold">User Service</h3>
                       </div>
-                      <p className="text-lg text-gray-400 leading-relaxed">
+                      <p className="text-sm sm:text-base md:text-lg text-gray-400 leading-relaxed">
                         Central user profile repository storing basic user data
                         and allowing profile updates (bio, avatar) after initial
                         creation. Stores user profile data in Postgres.
@@ -811,7 +849,7 @@ const App = () => {
                     </div>
                   </div>
 
-                  <div className="mt-8">
+                  <div className="mt-6 sm:mt-8">
                     <div
                       className="cursor-pointer group relative"
                       onClick={() => openLightbox("user-service.png")}
@@ -822,7 +860,7 @@ const App = () => {
                         className="w-full rounded-xl border border-white/5 group-hover:border-white/20 transition-all"
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all rounded-xl flex items-center justify-center">
-                        <span className="opacity-0 group-hover:opacity-100 text-sm bg-white/10 backdrop-blur px-4 py-2 rounded-lg transition-all">
+                        <span className="opacity-0 group-hover:opacity-100 text-xs sm:text-sm bg-white/10 backdrop-blur px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-all">
                           Click to enlarge
                         </span>
                       </div>
@@ -833,19 +871,19 @@ const App = () => {
 
               {/* Event Service */}
               <div className="glass-dark rounded-2xl overflow-hidden border border-white/5 hover:border-white/10 transition-all">
-                <div className="p-8 md:p-12">
-                  <div className="flex items-start gap-6 mb-6">
-                    <div className="flex-shrink-0 w-16 h-16 bg-green-500/10 rounded-xl flex items-center justify-center">
-                      <Settings className="text-green-400" size={32} />
+                <div className="p-6 sm:p-8 md:p-12">
+                  <div className="flex items-start gap-4 sm:gap-6 mb-4 sm:mb-6">
+                    <div className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-green-500/10 rounded-xl flex items-center justify-center">
+                      <Settings className="text-green-400" size={24} />
                     </div>
-                    <div>
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="text-sm font-mono text-gray-500">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                        <span className="text-xs sm:text-sm font-mono text-gray-500">
                           03
                         </span>
-                        <h3 className="text-3xl font-bold">Event Service</h3>
+                        <h3 className="text-xl sm:text-2xl md:text-3xl font-bold">Event Service</h3>
                       </div>
-                      <p className="text-lg text-gray-400 leading-relaxed">
+                      <p className="text-sm sm:text-base md:text-lg text-gray-400 leading-relaxed">
                         Handles creation and scheduling of sporting events.
                         Manages user registration as player or owner and
                         publishes participant data to RabbitMQ. Stores event
@@ -854,7 +892,7 @@ const App = () => {
                     </div>
                   </div>
 
-                  <div className="mt-8">
+                  <div className="mt-6 sm:mt-8">
                     <div
                       className="cursor-pointer group relative"
                       onClick={() => openLightbox("Event-service.png")}
@@ -865,7 +903,7 @@ const App = () => {
                         className="w-full rounded-xl border border-white/5 group-hover:border-white/20 transition-all"
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all rounded-xl flex items-center justify-center">
-                        <span className="opacity-0 group-hover:opacity-100 text-sm bg-white/10 backdrop-blur px-4 py-2 rounded-lg transition-all">
+                        <span className="opacity-0 group-hover:opacity-100 text-xs sm:text-sm bg-white/10 backdrop-blur px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-all">
                           Click to enlarge
                         </span>
                       </div>
@@ -876,19 +914,19 @@ const App = () => {
 
               {/* Auction Service */}
               <div className="glass-dark rounded-2xl overflow-hidden border border-white/5 hover:border-white/10 transition-all">
-                <div className="p-8 md:p-12">
-                  <div className="flex items-start gap-6 mb-6">
-                    <div className="flex-shrink-0 w-16 h-16 bg-yellow-500/10 rounded-xl flex items-center justify-center">
-                      <ShoppingCart className="text-yellow-400" size={32} />
+                <div className="p-6 sm:p-8 md:p-12">
+                  <div className="flex items-start gap-4 sm:gap-6 mb-4 sm:mb-6">
+                    <div className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-yellow-500/10 rounded-xl flex items-center justify-center">
+                      <ShoppingCart className="text-yellow-400" size={24} />
                     </div>
-                    <div>
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="text-sm font-mono text-gray-500">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                        <span className="text-xs sm:text-sm font-mono text-gray-500">
                           04
                         </span>
-                        <h3 className="text-3xl font-bold">Auction Service</h3>
+                        <h3 className="text-xl sm:text-2xl md:text-3xl font-bold">Auction Service</h3>
                       </div>
-                      <p className="text-lg text-gray-400 leading-relaxed">
+                      <p className="text-sm sm:text-base md:text-lg text-gray-400 leading-relaxed">
                         Consumes participant messages from RabbitMQ for live
                         player auctions. Uses Socket.IO for real-time bid
                         updates and Redis for quick access. Bidding handled
@@ -898,7 +936,7 @@ const App = () => {
                     </div>
                   </div>
 
-                  <div className="grid md:grid-cols-2 gap-4 mt-8">
+                  <div className="grid md:grid-cols-2 gap-3 sm:gap-4 mt-6 sm:mt-8">
                     <div
                       className="cursor-pointer group relative"
                       onClick={() => openLightbox("Auction-service.png")}
@@ -909,7 +947,7 @@ const App = () => {
                         className="w-full rounded-xl border border-white/5 group-hover:border-white/20 transition-all"
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all rounded-xl flex items-center justify-center">
-                        <span className="opacity-0 group-hover:opacity-100 text-sm bg-white/10 backdrop-blur px-4 py-2 rounded-lg transition-all">
+                        <span className="opacity-0 group-hover:opacity-100 text-xs sm:text-sm bg-white/10 backdrop-blur px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-all">
                           Click to enlarge
                         </span>
                       </div>
@@ -924,7 +962,7 @@ const App = () => {
                         className="w-full rounded-xl border border-white/5 group-hover:border-white/20 transition-all"
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all rounded-xl flex items-center justify-center">
-                        <span className="opacity-0 group-hover:opacity-100 text-sm bg-white/10 backdrop-blur px-4 py-2 rounded-lg transition-all">
+                        <span className="opacity-0 group-hover:opacity-100 text-xs sm:text-sm bg-white/10 backdrop-blur px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-all">
                           Click to enlarge
                         </span>
                       </div>
@@ -935,21 +973,21 @@ const App = () => {
 
               {/* Live Score Service */}
               <div className="glass-dark rounded-2xl overflow-hidden border border-white/5 hover:border-white/10 transition-all">
-                <div className="p-8 md:p-12">
-                  <div className="flex items-start gap-6 mb-6">
-                    <div className="flex-shrink-0 w-16 h-16 bg-red-500/10 rounded-xl flex items-center justify-center">
-                      <Radio className="text-red-400" size={32} />
+                <div className="p-6 sm:p-8 md:p-12">
+                  <div className="flex items-start gap-4 sm:gap-6 mb-4 sm:mb-6">
+                    <div className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-red-500/10 rounded-xl flex items-center justify-center">
+                      <Radio className="text-red-400" size={24} />
                     </div>
-                    <div>
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="text-sm font-mono text-gray-500">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                        <span className="text-xs sm:text-sm font-mono text-gray-500">
                           05
                         </span>
-                        <h3 className="text-3xl font-bold">
+                        <h3 className="text-xl sm:text-2xl md:text-3xl font-bold">
                           Live Score Service
                         </h3>
                       </div>
-                      <p className="text-lg text-gray-400 leading-relaxed">
+                      <p className="text-sm sm:text-base md:text-lg text-gray-400 leading-relaxed">
                         Provides real-time score updates using Socket.IO.
                         Prioritizes Redis cache for fast retrieval and fetches
                         team rosters from Auction Service. Stores match data in
@@ -958,7 +996,7 @@ const App = () => {
                     </div>
                   </div>
 
-                  <div className="mt-8">
+                  <div className="mt-6 sm:mt-8">
                     <div
                       className="cursor-pointer group relative"
                       onClick={() => openLightbox("Live-score-service.png")}
@@ -969,7 +1007,7 @@ const App = () => {
                         className="w-full rounded-xl border border-white/5 group-hover:border-white/20 transition-all"
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all rounded-xl flex items-center justify-center">
-                        <span className="opacity-0 group-hover:opacity-100 text-sm bg-white/10 backdrop-blur px-4 py-2 rounded-lg transition-all">
+                        <span className="opacity-0 group-hover:opacity-100 text-xs sm:text-sm bg-white/10 backdrop-blur px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-all">
                           Click to enlarge
                         </span>
                       </div>
@@ -980,21 +1018,21 @@ const App = () => {
 
               {/* RAG Agent Service */}
               <div className="glass-dark rounded-2xl overflow-hidden border border-white/5 hover:border-white/10 transition-all">
-                <div className="p-8 md:p-12">
-                  <div className="flex items-start gap-6 mb-6">
-                    <div className="flex-shrink-0 w-16 h-16 bg-cyan-500/10 rounded-xl flex items-center justify-center">
-                      <Bot className="text-cyan-400" size={32} />
+                <div className="p-6 sm:p-8 md:p-12">
+                  <div className="flex items-start gap-4 sm:gap-6 mb-4 sm:mb-6">
+                    <div className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-cyan-500/10 rounded-xl flex items-center justify-center">
+                      <Bot className="text-cyan-400" size={24} />
                     </div>
-                    <div>
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="text-sm font-mono text-gray-500">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                        <span className="text-xs sm:text-sm font-mono text-gray-500">
                           06
                         </span>
-                        <h3 className="text-3xl font-bold">
+                        <h3 className="text-xl sm:text-2xl md:text-3xl font-bold">
                           RAG Agent Service
                         </h3>
                       </div>
-                      <p className="text-lg text-gray-400 leading-relaxed">
+                      <p className="text-sm sm:text-base md:text-lg text-gray-400 leading-relaxed">
                         Q&A layer using LangChain and LLMs to generate insights
                         from system data. Accesses all service databases and
                         uses Pinecone for semantic search capabilities.
@@ -1002,7 +1040,7 @@ const App = () => {
                     </div>
                   </div>
 
-                  <div className="mt-8">
+                  <div className="mt-6 sm:mt-8">
                     <div
                       className="cursor-pointer group relative"
                       onClick={() => openLightbox("Cron-Jobs.png")}
@@ -1013,7 +1051,7 @@ const App = () => {
                         className="w-full rounded-xl border border-white/5 group-hover:border-white/20 transition-all"
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all rounded-xl flex items-center justify-center">
-                        <span className="opacity-0 group-hover:opacity-100 text-sm bg-white/10 backdrop-blur px-4 py-2 rounded-lg transition-all">
+                        <span className="opacity-0 group-hover:opacity-100 text-xs sm:text-sm bg-white/10 backdrop-blur px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-all">
                           Click to enlarge
                         </span>
                       </div>
@@ -1024,19 +1062,19 @@ const App = () => {
 
               {/* Deployment Service */}
               <div className="glass-dark rounded-2xl overflow-hidden border border-white/5 hover:border-white/10 transition-all">
-                <div className="p-8 md:p-12">
-                  <div className="flex items-start gap-6 mb-6">
-                    <div className="flex-shrink-0 w-16 h-16 bg-indigo-500/10 rounded-xl flex items-center justify-center">
-                      <Cloud className="text-indigo-400" size={32} />
+                <div className="p-6 sm:p-8 md:p-12">
+                  <div className="flex items-start gap-4 sm:gap-6 mb-4 sm:mb-6">
+                    <div className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-indigo-500/10 rounded-xl flex items-center justify-center">
+                      <Cloud className="text-indigo-400" size={24} />
                     </div>
-                    <div>
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="text-sm font-mono text-gray-500">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                        <span className="text-xs sm:text-sm font-mono text-gray-500">
                           07
                         </span>
-                        <h3 className="text-3xl font-bold">Deployment</h3>
+                        <h3 className="text-xl sm:text-2xl md:text-3xl font-bold">Deployment</h3>
                       </div>
-                      <p className="text-lg text-gray-400 leading-relaxed">
+                      <p className="text-sm sm:text-base md:text-lg text-gray-400 leading-relaxed">
                         Deployment handled by Docker and orchestrated by AWS
                         EKS. Automated using Jenkins CI/CD pipeline, pushing to
                         DockerHub with ArgoCD managing deployment. Monitored by
@@ -1045,7 +1083,7 @@ const App = () => {
                     </div>
                   </div>
 
-                  <div className="mt-8">
+                  <div className="mt-6 sm:mt-8">
                     <div
                       className="cursor-pointer group relative"
                       onClick={() => openLightbox("Deployment-service.png")}
@@ -1056,7 +1094,7 @@ const App = () => {
                         className="w-full rounded-xl border border-white/5 group-hover:border-white/20 transition-all"
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all rounded-xl flex items-center justify-center">
-                        <span className="opacity-0 group-hover:opacity-100 text-sm bg-white/10 backdrop-blur px-4 py-2 rounded-lg transition-all">
+                        <span className="opacity-0 group-hover:opacity-100 text-xs sm:text-sm bg-white/10 backdrop-blur px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-all">
                           Click to enlarge
                         </span>
                       </div>
@@ -1069,19 +1107,19 @@ const App = () => {
         </section>
 
         {/* Tech Stack */}
-        <section id="stack" className="py-32 px-6 bg-neutral-950/50">
+        <section id="stack" className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 bg-neutral-950/50">
           <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-20">
-              <h2 className="text-5xl md:text-6xl font-bold mb-6">
+            <div className="text-center mb-12 sm:mb-16 md:mb-20">
+              <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 sm:mb-6">
                 Tech Stack
               </h2>
-              <div className="w-20 h-1 bg-white mx-auto mb-8"></div>
-              <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+              <div className="w-16 sm:w-20 h-1 bg-white mx-auto mb-6 sm:mb-8"></div>
+              <p className="text-base sm:text-lg md:text-xl text-gray-400 max-w-3xl mx-auto px-4">
                 Modern technologies powering a scalable, distributed system
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {[
                 {
                   icon: Database,
@@ -1176,15 +1214,15 @@ const App = () => {
               ].map((item, idx) => (
                 <div
                   key={idx}
-                  className="glass-dark p-6 rounded-xl border border-white/5 hover:border-white/10 transition-all group"
+                  className="glass-dark p-4 sm:p-6 rounded-xl border border-white/5 hover:border-white/10 transition-all group"
                 >
                   <div
-                    className={`w-12 h-12 bg-${item.color}-500/10 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}
+                    className={`w-10 h-10 sm:w-12 sm:h-12 bg-${item.color}-500/10 rounded-lg flex items-center justify-center mb-3 sm:mb-4 group-hover:scale-110 transition-transform`}
                   >
-                    <item.icon className={`text-${item.color}-400`} size={24} />
+                    <item.icon className={`text-${item.color}-400`} size={20} />
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">{item.name}</h3>
-                  <p className="text-gray-400 text-sm leading-relaxed">
+                  <h3 className="text-lg sm:text-xl font-semibold mb-1 sm:mb-2">{item.name}</h3>
+                  <p className="text-gray-400 text-xs sm:text-sm leading-relaxed">
                     {item.purpose}
                   </p>
                 </div>
@@ -1194,67 +1232,67 @@ const App = () => {
         </section>
 
         {/* Contact Section */}
-        <section id="contact" className="py-32 px-6">
+        <section id="contact" className="py-12 sm:py-16 md:py-24 lg:py-32 px-4 sm:px-6">
           <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-5xl md:text-6xl font-bold mb-6">
+            <div className="text-center mb-8 sm:mb-10 md:mb-16">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 sm:mb-4 md:mb-6">
                 Get in Touch
               </h2>
-              <div className="w-20 h-1 bg-white mx-auto mb-8"></div>
-              <p className="text-xl text-gray-400">
+              <div className="w-12 sm:w-16 md:w-20 h-1 bg-white mx-auto mb-4 sm:mb-6 md:mb-8"></div>
+              <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-400 px-4">
                 Let's connect and discuss engineering
               </p>
             </div>
 
-            <div className="glass-dark p-12 rounded-2xl border border-white/5">
-              <div className="text-center mb-12">
-                <h3 className="text-3xl font-bold mb-2">Kaustubh Duse</h3>
-                <p className="text-gray-400">Full Stack Developer</p>
+            <div className="glass-dark p-4 sm:p-6 md:p-8 lg:p-12 rounded-xl sm:rounded-2xl border border-white/5">
+              <div className="text-center mb-8 sm:mb-10 md:mb-12">
+                <h3 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">Kaustubh Duse</h3>
+                <p className="text-sm sm:text-base text-gray-400">Full Stack Developer</p>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
                 <a
                   href="https://github.com/kaustubhduse"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-4 p-6 glass rounded-xl hover:bg-white/10 transition-all group"
+                  className="flex items-center gap-3 sm:gap-4 p-4 sm:p-5 md:p-6 glass rounded-lg sm:rounded-xl hover:bg-white/10 transition-all group"
                 >
-                  <div className="w-12 h-12 bg-white/5 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Github size={24} />
+                  <div className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-white/5 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform flex-shrink-0">
+                    <Github size={20} className="sm:w-5 sm:h-5 md:w-6 md:h-6" />
                   </div>
-                  <div>
-                    <div className="text-sm text-gray-400">GitHub</div>
-                    <div className="font-medium">kaustubhduse</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs sm:text-sm text-gray-400">GitHub</div>
+                    <div className="font-medium text-sm sm:text-base truncate">kaustubhduse</div>
                   </div>
-                  <ExternalLink size={16} className="ml-auto text-gray-400" />
+                  <ExternalLink size={14} className="sm:w-4 sm:h-4 text-gray-400 flex-shrink-0" />
                 </a>
 
                 <a
                   href="https://www.linkedin.com/in/kaustubh-duse-75a531254/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-4 p-6 glass rounded-xl hover:bg-white/10 transition-all group"
+                  className="flex items-center gap-3 sm:gap-4 p-4 sm:p-5 md:p-6 glass rounded-lg sm:rounded-xl hover:bg-white/10 transition-all group"
                 >
-                  <div className="w-12 h-12 bg-white/5 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Linkedin size={24} />
+                  <div className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-white/5 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform flex-shrink-0">
+                    <Linkedin size={20} className="sm:w-5 sm:h-5 md:w-6 md:h-6" />
                   </div>
-                  <div>
-                    <div className="text-sm text-gray-400">LinkedIn</div>
-                    <div className="font-medium">kaustubh-duse</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs sm:text-sm text-gray-400">LinkedIn</div>
+                    <div className="font-medium text-sm sm:text-base truncate">kaustubh-duse</div>
                   </div>
-                  <ExternalLink size={16} className="ml-auto text-gray-400" />
+                  <ExternalLink size={14} className="sm:w-4 sm:h-4 text-gray-400 flex-shrink-0" />
                 </a>
 
                 <a
                   href="mailto:kaustubhduse2004@gmail.com"
-                  className="flex items-center gap-4 p-6 glass rounded-xl hover:bg-white/10 transition-all group"
+                  className="flex items-center gap-3 sm:gap-4 p-4 sm:p-5 md:p-6 glass rounded-lg sm:rounded-xl hover:bg-white/10 transition-all group"
                 >
-                  <div className="w-12 h-12 bg-white/5 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Mail size={24} />
+                  <div className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-white/5 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform flex-shrink-0">
+                    <Mail size={20} className="sm:w-5 sm:h-5 md:w-6 md:h-6" />
                   </div>
-                  <div>
-                    <div className="text-sm text-gray-400">Email</div>
-                    <div className="font-medium">
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs sm:text-sm text-gray-400">Email</div>
+                    <div className="font-medium text-sm sm:text-base truncate">
                       kaustubhduse2004@gmail.com
                     </div>
                   </div>
@@ -1262,26 +1300,26 @@ const App = () => {
 
                 <a
                   href="tel:9321992789"
-                  className="flex items-center gap-4 p-6 glass rounded-xl hover:bg-white/10 transition-all group"
+                  className="flex items-center gap-3 sm:gap-4 p-4 sm:p-5 md:p-6 glass rounded-lg sm:rounded-xl hover:bg-white/10 transition-all group"
                 >
-                  <div className="w-12 h-12 bg-white/5 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Phone size={24} />
+                  <div className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-white/5 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform flex-shrink-0">
+                    <Phone size={20} className="sm:w-5 sm:h-5 md:w-6 md:h-6" />
                   </div>
-                  <div>
-                    <div className="text-sm text-gray-400">Phone</div>
-                    <div className="font-medium">+91 9321992789</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs sm:text-sm text-gray-400">Phone</div>
+                    <div className="font-medium text-sm sm:text-base">+91 9321992789</div>
                   </div>
                 </a>
               </div>
 
-              <div className="mt-10 pt-10 border-t border-white/5 text-center">
+              <div className="mt-6 sm:mt-8 md:mt-10 pt-6 sm:pt-8 md:pt-10 border-t border-white/5 text-center">
                 <a
                   href="https://github.com/kaustubhduse/SportSync/blob/main/README.md"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+                  className="inline-flex items-center gap-2 text-sm sm:text-base text-gray-400 hover:text-white transition-colors"
                 >
-                  <ExternalLink size={16} />
+                  <ExternalLink size={14} className="sm:w-4 sm:h-4" />
                   View Full Documentation
                 </a>
               </div>
@@ -1290,9 +1328,9 @@ const App = () => {
         </section>
 
         {/* Footer */}
-        <footer className="py-12 px-6 border-t border-white/5">
+        <footer className="py-6 sm:py-8 md:py-12 px-4 sm:px-6 border-t border-white/5">
           <div className="max-w-7xl mx-auto text-center text-gray-400">
-            <p>
+            <p className="text-xs sm:text-sm md:text-base leading-relaxed">
               &copy; 2025 SportsSync Engineering. Built with passion and
               precision.
             </p>
