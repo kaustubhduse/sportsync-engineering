@@ -740,10 +740,10 @@ const App = () => {
                 </h3>
                 <p className="text-gray-400 leading-relaxed text-sm sm:text-base md:text-lg">
                   During sports auctions at our institute, the excitement was
-                  real, but so was the confusion. Volunteers tried to track
-                  every bid, but updates were either delayed or inconsistent. By
-                  the time the auction ended, teams questioned who won which
-                  player, and players weren't sure where they landed.
+                  real, but so was the <strong className="text-white font-semibold">confusion</strong>. Volunteers tried to track
+                  every bid, but updates were either <strong className="text-white font-semibold">delayed or inconsistent</strong>. By
+                  the time the auction ended, teams questioned <strong className="text-white font-semibold">who won which
+                  player</strong>, and players weren't sure where they landed.
                 </p>
               </div>
 
@@ -752,11 +752,11 @@ const App = () => {
                   The Solution
                 </h3>
                 <p className="text-gray-400 leading-relaxed text-sm sm:text-base md:text-lg">
-                  SportsSync creates a centralized platform for managing sports
-                  auctions efficiently. It ensures complete transparency by
-                  displaying final bid amounts and team assignments, with data
-                  seamlessly flowing into the Live Score Service for real-time
-                  match management.
+                  SportsSync creates a <strong className="text-white font-semibold">centralized platform</strong> for managing sports
+                  auctions efficiently. It ensures <strong className="text-white font-semibold">complete transparency</strong> by
+                  displaying <strong className="text-white font-semibold">final bid amounts</strong> and <strong className="text-white font-semibold">team assignments</strong>, with data
+                  seamlessly flowing into the <strong className="text-white font-semibold">Live Score Service</strong> for <strong className="text-white font-semibold">real-time
+                  match management</strong>.
                 </p>
               </div>
             </div>
@@ -828,10 +828,10 @@ const App = () => {
                         </h3>
                       </div>
                       <p className="text-sm sm:text-base md:text-lg text-gray-400 leading-relaxed">
-                        Manages user sign-up, login, and Google OAuth 2.0
-                        integration. Issues and validates JWTs for securing all
+                        Manages user <strong className="text-white font-semibold">sign-up</strong>, <strong className="text-white font-semibold">login</strong>, and <strong className="text-white font-semibold">Google OAuth 2.0</strong> integration. 
+                        Issues and validates <strong className="text-white font-semibold">JWTs</strong> for securing all
                         other services. Stores authentication details and
-                        refresh tokens in Postgres.
+                        refresh tokens in <strong className="text-white font-semibold">Postgres</strong>.
                       </p>
                     </div>
                   </div>
@@ -888,9 +888,9 @@ const App = () => {
                         </h3>
                       </div>
                       <p className="text-sm sm:text-base md:text-lg text-gray-400 leading-relaxed">
-                        Central user profile repository storing basic user data
-                        and allowing profile updates (bio, avatar) after initial
-                        creation. Stores user profile data in Postgres.
+                        Central <strong className="text-white font-semibold">user profile repository</strong> storing basic user data
+                        and allowing <strong className="text-white font-semibold">profile updates</strong> (bio, avatar) after initial
+                        creation. Stores user profile data in <strong className="text-white font-semibold">Postgres</strong>.
                       </p>
                     </div>
                   </div>
@@ -932,10 +932,10 @@ const App = () => {
                         </h3>
                       </div>
                       <p className="text-sm sm:text-base md:text-lg text-gray-400 leading-relaxed">
-                        Handles creation and scheduling of sporting events.
-                        Manages user registration as player or owner and
-                        publishes participant data to RabbitMQ. Stores event
-                        data in MongoDB.
+                        Handles <strong className="text-white font-semibold">creation and scheduling</strong> of sporting events.
+                        Manages user registration as <strong className="text-white font-semibold">player or owner</strong> and
+                        publishes participant data to <strong className="text-white font-semibold">RabbitMQ</strong>. Stores event
+                        data in <strong className="text-white font-semibold">MongoDB</strong>.
                       </p>
                     </div>
                   </div>
@@ -977,11 +977,11 @@ const App = () => {
                         </h3>
                       </div>
                       <p className="text-sm sm:text-base md:text-lg text-gray-400 leading-relaxed">
-                        Consumes participant messages from RabbitMQ for live
-                        player auctions. Uses Socket.IO for real-time bid
-                        updates and Redis for quick access. Bidding handled
-                        through Redis + Lua atomic script ensuring FCFS
-                        fairness. Stores data in MongoDB.
+                        Consumes participant messages from <strong className="text-white font-semibold">RabbitMQ</strong> for live
+                        player auctions. Uses <strong className="text-white font-semibold">Socket.IO</strong> for <strong className="text-white font-semibold">real-time bid
+                        updates</strong> and <strong className="text-white font-semibold">Redis</strong> for quick access. Bidding handled
+                        through <strong className="text-white font-semibold">Redis + Lua atomic script</strong> ensuring <strong className="text-white font-semibold">FCFS
+                        fairness</strong>. Stores data in <strong className="text-white font-semibold">MongoDB</strong>.
                       </p>
                     </div>
                   </div>
@@ -1038,10 +1038,10 @@ const App = () => {
                         </h3>
                       </div>
                       <p className="text-sm sm:text-base md:text-lg text-gray-400 leading-relaxed">
-                        Provides real-time score updates using Socket.IO.
-                        Prioritizes Redis cache for fast retrieval and fetches
-                        team rosters from Auction Service. Stores match data in
-                        MongoDB.
+                        Provides <strong className="text-white font-semibold">real-time score updates</strong> using <strong className="text-white font-semibold">Socket.IO</strong>.
+                        Prioritizes <strong className="text-white font-semibold">Redis cache</strong> for fast retrieval and fetches
+                        <strong className="text-white font-semibold">team rosters</strong> from Auction Service. Stores match data in
+                        <strong className="text-white font-semibold">MongoDB</strong>.
                       </p>
                     </div>
                   </div>
@@ -1083,9 +1083,9 @@ const App = () => {
                         </h3>
                       </div>
                       <p className="text-sm sm:text-base md:text-lg text-gray-400 leading-relaxed">
-                        Q&A layer using LangChain and LLMs to generate insights
-                        from system data. Accesses all service databases and
-                        uses Pinecone for semantic search capabilities.
+                        <strong className="text-white font-semibold">Q&A layer</strong> using <strong className="text-white font-semibold">LangChain and LLMs</strong> to generate insights
+                        from system data. Accesses <strong className="text-white font-semibold">all service databases</strong> and
+                        uses <strong className="text-white font-semibold">Pinecone</strong> for <strong className="text-white font-semibold">semantic search</strong> capabilities.
                       </p>
                     </div>
                   </div>
@@ -1127,10 +1127,10 @@ const App = () => {
                         </h3>
                       </div>
                       <p className="text-sm sm:text-base md:text-lg text-gray-400 leading-relaxed">
-                        Deployment handled by Docker and orchestrated by AWS
-                        EKS. Automated using Jenkins CI/CD pipeline, pushing to
-                        DockerHub with ArgoCD managing deployment. Monitored by
-                        Prometheus and Grafana.
+                        Deployment handled by <strong className="text-white font-semibold">Docker</strong> and orchestrated by <strong className="text-white font-semibold">AWS
+                        EKS</strong>. Automated using <strong className="text-white font-semibold">Jenkins CI/CD pipeline</strong>, pushing to
+                        <strong className="text-white font-semibold">DockerHub</strong> with <strong className="text-white font-semibold">ArgoCD</strong> managing deployment. Monitored by
+                        <strong className="text-white font-semibold">Prometheus and Grafana</strong>.
                       </p>
                     </div>
                   </div>
@@ -1178,110 +1178,131 @@ const App = () => {
               {[
                 {
                   icon: Database,
-                  name: "PostgreSQL",
-                  purpose: "Relational data with ACID compliance",
+                  name: "Postgres",
+                  usage: "Auth-Service & User-Service",
+                  why: "Structured relational data (user accounts and profile fields) that requires strong consistency and transactional integrity.",
                   color: "blue",
                 },
                 {
                   icon: Code,
                   name: "Prisma ORM",
-                  purpose: "Type-safe database access",
+                  usage: "With PostgreSQL",
+                  why: "Familiar syntax, less boilerplate code and fewer bugs.",
                   color: "purple",
                 },
                 {
                   icon: Database,
                   name: "MongoDB",
-                  purpose: "Flexible document storage",
+                  usage: "Event, Auction & Live-Score Services",
+                  why: "Flexible document schema for rapidly changing data.",
                   color: "green",
                 },
                 {
                   icon: Radio,
                   name: "Socket.IO",
-                  purpose: "Real-time bidirectional communication",
+                  usage: "Real-time Communication",
+                  why: "Enables instant bid updates and live score updates.",
                   color: "yellow",
                 },
                 {
                   icon: Database,
                   name: "Redis",
-                  purpose: "High-performance caching layer",
+                  usage: "Caching",
+                  why: "Fast read access to frequently requested, non-permanent data.",
                   color: "red",
                 },
                 {
                   icon: Layers,
                   name: "RabbitMQ",
-                  purpose: "Asynchronous message queuing",
+                  usage: "Message Queues",
+                  why: "Decouples services and enables asynchronous communication.",
                   color: "orange",
                 },
                 {
                   icon: Bot,
-                  name: "LangChain",
-                  purpose: "AI agent framework",
+                  name: "Langchain",
+                  usage: "AI Agent",
+                  why: "Provides a framework for building and managing AI agents.",
                   color: "cyan",
                 },
                 {
                   icon: Bot,
                   name: "OpenAI LLM",
-                  purpose: "Natural language processing",
+                  usage: "AI Analysis",
+                  why: "Leverages advanced language models for natural language understanding.",
                   color: "teal",
                 },
                 {
                   icon: Container,
                   name: "Docker",
-                  purpose: "Application containerization",
+                  usage: "Containerization",
+                  why: "Ensures consistent environments across development and production.",
                   color: "blue",
                 },
                 {
                   icon: Settings,
                   name: "Kubernetes",
-                  purpose: "Container orchestration",
+                  usage: "Orchestration",
+                  why: "Automates deployment, scaling, and management of containerized applications.",
                   color: "indigo",
                 },
                 {
                   icon: GitBranch,
                   name: "Jenkins",
-                  purpose: "Continuous integration",
+                  usage: "CI",
+                  why: "Automates the software development process, enabling continuous integration.",
                   color: "red",
                 },
                 {
                   icon: GitBranch,
                   name: "ArgoCD",
-                  purpose: "GitOps deployment",
+                  usage: "CD",
+                  why: "Enables continuous delivery and deployment of applications.",
                   color: "orange",
                 },
                 {
                   icon: Cloud,
-                  name: "AWS EKS",
-                  purpose: "Managed Kubernetes service",
+                  name: "AWS EC2",
+                  usage: "Deployment",
+                  why: "Provides scalable compute capacity in the cloud.",
                   color: "yellow",
                 },
                 {
-                  icon: Server,
-                  name: "Prometheus",
-                  purpose: "Metrics and monitoring",
-                  color: "red",
+                  icon: Cloud,
+                  name: "AWS EKS",
+                  usage: "Container Orchestration",
+                  why: "Simplifies running Kubernetes on AWS without needing to install and operate your own Kubernetes control plane.",
+                  color: "indigo",
                 },
                 {
                   icon: Server,
-                  name: "Grafana",
-                  purpose: "Visualization and dashboards",
+                  name: "Prometheus & Grafana",
+                  usage: "Monitoring",
+                  why: "Provides powerful monitoring and visualization capabilities for the entire system.",
                   color: "orange",
                 },
               ].map((item, idx) => (
                 <div
                   key={idx}
-                  className="glass-dark p-4 sm:p-6 rounded-xl border border-white/5 hover:border-white/10 transition-all group"
+                  className="glass-dark p-4 sm:p-5 md:p-6 rounded-xl border border-white/5 hover:border-white/10 transition-all group"
                 >
                   <div
                     className={`w-10 h-10 sm:w-12 sm:h-12 bg-${item.color}-500/10 rounded-lg flex items-center justify-center mb-3 sm:mb-4 group-hover:scale-110 transition-transform`}
                   >
                     <item.icon className={`text-${item.color}-400`} size={20} />
                   </div>
-                  <h3 className="text-lg sm:text-xl font-semibold mb-1 sm:mb-2">
+                  <h3 className="text-base sm:text-lg md:text-xl font-bold mb-1">
                     {item.name}
                   </h3>
-                  <p className="text-gray-400 text-xs sm:text-sm leading-relaxed">
-                    {item.purpose}
+                  <p className="text-xs sm:text-sm text-gray-500 mb-2 sm:mb-3">
+                    for {item.usage}
                   </p>
+                  <div className="space-y-1">
+                    <p className="text-xs font-semibold text-white/90">Why?</p>
+                    <p className="text-gray-400 text-xs sm:text-sm leading-relaxed">
+                      {item.why}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
