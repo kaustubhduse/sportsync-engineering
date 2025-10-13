@@ -288,8 +288,12 @@ const App = () => {
     };
 
     const container = imageContainerRef.current;
-    container.addEventListener("touchstart", handleTouchStart, { passive: false });
-    container.addEventListener("touchmove", handleTouchMove, { passive: false });
+    container.addEventListener("touchstart", handleTouchStart, {
+      passive: false,
+    });
+    container.addEventListener("touchmove", handleTouchMove, {
+      passive: false,
+    });
 
     return () => {
       container.removeEventListener("touchstart", handleTouchStart);
@@ -409,7 +413,7 @@ const App = () => {
 
       {/* Image Lightbox Modal - Advanced with Zoom */}
       {lightboxOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-[100] bg-black/98 backdrop-blur-xl"
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
@@ -422,16 +426,23 @@ const App = () => {
                 {architectureImages.map((img, idx) => (
                   <button
                     key={idx}
-                    onClick={() => { setCurrentImageIndex(idx); resetZoom(); }}
+                    onClick={() => {
+                      setCurrentImageIndex(idx);
+                      resetZoom();
+                    }}
                     className={`relative flex-shrink-0 group transition-all duration-300 ${
-                      idx === currentImageIndex ? "scale-105" : "opacity-60 hover:opacity-100"
+                      idx === currentImageIndex
+                        ? "scale-105"
+                        : "opacity-60 hover:opacity-100"
                     }`}
                   >
-                    <div className={`w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden border-2 transition-all ${
-                      idx === currentImageIndex
-                        ? "border-white shadow-lg shadow-white/20"
-                        : "border-white/10 hover:border-white/30"
-                    }`}>
+                    <div
+                      className={`w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                        idx === currentImageIndex
+                          ? "border-white shadow-lg shadow-white/20"
+                          : "border-white/10 hover:border-white/30"
+                      }`}
+                    >
                       <img
                         src={img.src}
                         alt={img.title}
@@ -473,7 +484,10 @@ const App = () => {
               className="glass-dark w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center hover:bg-white/10 transition-all group"
               aria-label="Close"
             >
-              <X size={20} className="md:w-6 md:h-6 group-hover:rotate-90 transition-transform duration-300" />
+              <X
+                size={20}
+                className="md:w-6 md:h-6 group-hover:rotate-90 transition-transform duration-300"
+              />
             </button>
           </div>
 
@@ -485,29 +499,38 @@ const App = () => {
               className="glass-dark w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center hover:bg-white/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed group"
               aria-label="Zoom in"
             >
-              <ZoomIn size={20} className="md:w-6 md:h-6 group-hover:scale-110 transition-transform" />
+              <ZoomIn
+                size={20}
+                className="md:w-6 md:h-6 group-hover:scale-110 transition-transform"
+              />
             </button>
-            
+
             <div className="glass-dark px-2 py-1 rounded-xl text-xs font-mono text-center">
               {Math.round(zoomLevel * 100)}%
             </div>
-            
+
             <button
               onClick={handleZoomOut}
               disabled={zoomLevel <= 1}
               className="glass-dark w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center hover:bg-white/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed group"
               aria-label="Zoom out"
             >
-              <ZoomOut size={20} className="md:w-6 md:h-6 group-hover:scale-110 transition-transform" />
+              <ZoomOut
+                size={20}
+                className="md:w-6 md:h-6 group-hover:scale-110 transition-transform"
+              />
             </button>
-            
+
             <button
               onClick={handleResetZoom}
               disabled={zoomLevel === 1}
               className="glass-dark w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center hover:bg-white/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed group"
               aria-label="Reset zoom"
             >
-              <Maximize2 size={18} className="md:w-5 md:h-5 group-hover:scale-110 transition-transform" />
+              <Maximize2
+                size={18}
+                className="md:w-5 md:h-5 group-hover:scale-110 transition-transform"
+              />
             </button>
           </div>
 
@@ -517,7 +540,10 @@ const App = () => {
             className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-16 md:h-16 glass-dark rounded-xl flex items-center justify-center hover:bg-white/10 transition-all group"
             aria-label="Previous"
           >
-            <ChevronLeft size={24} className="md:w-8 md:h-8 group-hover:-translate-x-1 transition-transform" />
+            <ChevronLeft
+              size={24}
+              className="md:w-8 md:h-8 group-hover:-translate-x-1 transition-transform"
+            />
           </button>
 
           <button
@@ -525,23 +551,35 @@ const App = () => {
             className="absolute right-20 md:right-24 top-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-16 md:h-16 glass-dark rounded-xl flex items-center justify-center hover:bg-white/10 transition-all group"
             aria-label="Next"
           >
-            <ChevronRight size={24} className="md:w-8 md:h-8 group-hover:translate-x-1 transition-transform" />
+            <ChevronRight
+              size={24}
+              className="md:w-8 md:h-8 group-hover:translate-x-1 transition-transform"
+            />
           </button>
 
           {/* Main Image Container with Zoom & Pan */}
           <div className="absolute inset-0 flex items-center justify-center pt-32 pb-8">
-            <div 
+            <div
               ref={imageContainerRef}
               className="relative w-full h-full flex items-center justify-center overflow-hidden"
-              style={{ cursor: zoomLevel > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default' }}
+              style={{
+                cursor:
+                  zoomLevel > 1
+                    ? isDragging
+                      ? "grabbing"
+                      : "grab"
+                    : "default",
+              }}
             >
               <img
                 src={architectureImages[currentImageIndex].src}
                 alt={architectureImages[currentImageIndex].title}
                 className="max-w-full max-h-full object-contain rounded-xl transition-transform duration-200 select-none"
                 style={{
-                  transform: `scale(${zoomLevel}) translate(${imagePosition.x / zoomLevel}px, ${imagePosition.y / zoomLevel}px)`,
-                  transformOrigin: 'center center',
+                  transform: `scale(${zoomLevel}) translate(${
+                    imagePosition.x / zoomLevel
+                  }px, ${imagePosition.y / zoomLevel}px)`,
+                  transformOrigin: "center center",
                 }}
                 onMouseDown={handleMouseDown}
                 draggable={false}
