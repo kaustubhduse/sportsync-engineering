@@ -31,16 +31,56 @@ const App = () => {
 
   // Define all architecture images with metadata
   const architectureImages = [
-    { src: "High-level.png", title: "High-Level Architecture", description: "System overview" },
-    { src: "Auth-service.png", title: "Auth Service", description: "Authentication flow" },
-    { src: "Google-Oauth-2.0.png", title: "OAuth 2.0", description: "Google OAuth integration" },
-    { src: "user-service.png", title: "User Service", description: "User profile management" },
-    { src: "Event-service.png", title: "Event Service", description: "Event creation and scheduling" },
-    { src: "Auction-service.png", title: "Auction Service", description: "Live auction management" },
-    { src: "Bidding.png", title: "Bidding Flow", description: "Redis + Lua bidding logic" },
-    { src: "Live-score-service.png", title: "Live Score Service", description: "Real-time score updates" },
-    { src: "Cron-Jobs.png", title: "RAG Agent Service", description: "AI-powered Q&A layer" },
-    { src: "Deployment-service.png", title: "Deployment", description: "CI/CD pipeline" },
+    {
+      src: "High-level.png",
+      title: "High-Level Architecture",
+      description: "System overview",
+    },
+    {
+      src: "Auth-service.png",
+      title: "Auth Service",
+      description: "Authentication flow",
+    },
+    {
+      src: "Google-Oauth-2.0.png",
+      title: "OAuth 2.0",
+      description: "Google OAuth integration",
+    },
+    {
+      src: "user-service.png",
+      title: "User Service",
+      description: "User profile management",
+    },
+    {
+      src: "Event-service.png",
+      title: "Event Service",
+      description: "Event creation and scheduling",
+    },
+    {
+      src: "Auction-service.png",
+      title: "Auction Service",
+      description: "Live auction management",
+    },
+    {
+      src: "Bidding.png",
+      title: "Bidding Flow",
+      description: "Redis + Lua bidding logic",
+    },
+    {
+      src: "Live-score-service.png",
+      title: "Live Score Service",
+      description: "Real-time score updates",
+    },
+    {
+      src: "Cron-Jobs.png",
+      title: "RAG Agent Service",
+      description: "AI-powered Q&A layer",
+    },
+    {
+      src: "Deployment-service.png",
+      title: "Deployment",
+      description: "CI/CD pipeline",
+    },
   ];
 
   useEffect(() => {
@@ -53,7 +93,7 @@ const App = () => {
   useEffect(() => {
     const handleKeyPress = (e) => {
       if (!lightboxOpen) return;
-      
+
       if (e.key === "Escape") {
         setLightboxOpen(false);
       } else if (e.key === "ArrowLeft") {
@@ -68,24 +108,27 @@ const App = () => {
   }, [lightboxOpen, currentImageIndex]);
 
   const openLightbox = (imageSrc) => {
-    const index = architectureImages.findIndex(img => img.src === imageSrc);
+    const index = architectureImages.findIndex((img) => img.src === imageSrc);
     if (index !== -1) {
       setCurrentImageIndex(index);
       setLightboxOpen(true);
-      document.body.style.overflow = 'hidden'; // Prevent background scrolling
+      document.body.style.overflow = "hidden"; // Prevent background scrolling
     }
   };
 
   const closeLightbox = () => {
     setLightboxOpen(false);
-    document.body.style.overflow = 'unset';
+    document.body.style.overflow = "unset";
   };
 
   const navigateImage = (direction) => {
     if (direction === "next") {
       setCurrentImageIndex((prev) => (prev + 1) % architectureImages.length);
     } else {
-      setCurrentImageIndex((prev) => (prev - 1 + architectureImages.length) % architectureImages.length);
+      setCurrentImageIndex(
+        (prev) =>
+          (prev - 1 + architectureImages.length) % architectureImages.length
+      );
     }
   };
 
@@ -208,7 +251,10 @@ const App = () => {
             className="absolute top-6 right-6 w-12 h-12 glass-dark rounded-full flex items-center justify-center hover:bg-white/10 transition-all group z-10"
             aria-label="Close lightbox"
           >
-            <X size={24} className="group-hover:scale-110 transition-transform" />
+            <X
+              size={24}
+              className="group-hover:scale-110 transition-transform"
+            />
           </button>
 
           {/* Image counter */}
@@ -222,7 +268,10 @@ const App = () => {
             className="absolute left-6 w-14 h-14 glass-dark rounded-full flex items-center justify-center hover:bg-white/10 transition-all group"
             aria-label="Previous image"
           >
-            <ChevronLeft size={28} className="group-hover:-translate-x-1 transition-transform" />
+            <ChevronLeft
+              size={28}
+              className="group-hover:-translate-x-1 transition-transform"
+            />
           </button>
 
           {/* Next button */}
@@ -231,7 +280,10 @@ const App = () => {
             className="absolute right-6 w-14 h-14 glass-dark rounded-full flex items-center justify-center hover:bg-white/10 transition-all group"
             aria-label="Next image"
           >
-            <ChevronRight size={28} className="group-hover:translate-x-1 transition-transform" />
+            <ChevronRight
+              size={28}
+              className="group-hover:translate-x-1 transition-transform"
+            />
           </button>
 
           {/* Image container */}
@@ -244,7 +296,7 @@ const App = () => {
                 {architectureImages[currentImageIndex].description}
               </p>
             </div>
-            
+
             <div className="relative">
               <img
                 src={architectureImages[currentImageIndex].src}
@@ -380,8 +432,10 @@ const App = () => {
               </p>
             </div>
 
-            <div className="glass-dark p-8 rounded-2xl cursor-pointer hover:border-white/20 transition-all group"
-                 onClick={() => openLightbox("High-level.png")}>
+            <div
+              className="glass-dark p-8 rounded-2xl cursor-pointer hover:border-white/20 transition-all group"
+              onClick={() => openLightbox("High-level.png")}
+            >
               <img
                 src="High-level.png"
                 alt="Architecture Diagram"
@@ -433,7 +487,10 @@ const App = () => {
                   </div>
 
                   <div className="grid md:grid-cols-2 gap-4 mt-8">
-                    <div className="cursor-pointer group relative" onClick={() => openLightbox("Auth-service.png")}>
+                    <div
+                      className="cursor-pointer group relative"
+                      onClick={() => openLightbox("Auth-service.png")}
+                    >
                       <img
                         src="Auth-service.png"
                         alt="Auth Service"
@@ -445,7 +502,10 @@ const App = () => {
                         </span>
                       </div>
                     </div>
-                    <div className="cursor-pointer group relative" onClick={() => openLightbox("Google-Oauth-2.0.png")}>
+                    <div
+                      className="cursor-pointer group relative"
+                      onClick={() => openLightbox("Google-Oauth-2.0.png")}
+                    >
                       <img
                         src="Google-Oauth-2.0.png"
                         alt="OAuth Flow"
@@ -484,7 +544,10 @@ const App = () => {
                   </div>
 
                   <div className="mt-8">
-                    <div className="cursor-pointer group relative" onClick={() => openLightbox("user-service.png")}>
+                    <div
+                      className="cursor-pointer group relative"
+                      onClick={() => openLightbox("user-service.png")}
+                    >
                       <img
                         src="user-service.png"
                         alt="User Service"
@@ -524,7 +587,10 @@ const App = () => {
                   </div>
 
                   <div className="mt-8">
-                    <div className="cursor-pointer group relative" onClick={() => openLightbox("Event-service.png")}>
+                    <div
+                      className="cursor-pointer group relative"
+                      onClick={() => openLightbox("Event-service.png")}
+                    >
                       <img
                         src="Event-service.png"
                         alt="Event Service"
@@ -565,7 +631,10 @@ const App = () => {
                   </div>
 
                   <div className="grid md:grid-cols-2 gap-4 mt-8">
-                    <div className="cursor-pointer group relative" onClick={() => openLightbox("Auction-service.png")}>
+                    <div
+                      className="cursor-pointer group relative"
+                      onClick={() => openLightbox("Auction-service.png")}
+                    >
                       <img
                         src="Auction-service.png"
                         alt="Auction Service"
@@ -577,7 +646,10 @@ const App = () => {
                         </span>
                       </div>
                     </div>
-                    <div className="cursor-pointer group relative" onClick={() => openLightbox("Bidding.png")}>
+                    <div
+                      className="cursor-pointer group relative"
+                      onClick={() => openLightbox("Bidding.png")}
+                    >
                       <img
                         src="Bidding.png"
                         alt="Bidding Flow"
@@ -619,7 +691,10 @@ const App = () => {
                   </div>
 
                   <div className="mt-8">
-                    <div className="cursor-pointer group relative" onClick={() => openLightbox("Live-score-service.png")}>
+                    <div
+                      className="cursor-pointer group relative"
+                      onClick={() => openLightbox("Live-score-service.png")}
+                    >
                       <img
                         src="Live-score-service.png"
                         alt="Live Score Service"
@@ -660,7 +735,10 @@ const App = () => {
                   </div>
 
                   <div className="mt-8">
-                    <div className="cursor-pointer group relative" onClick={() => openLightbox("Cron-Jobs.png")}>
+                    <div
+                      className="cursor-pointer group relative"
+                      onClick={() => openLightbox("Cron-Jobs.png")}
+                    >
                       <img
                         src="Cron-Jobs.png"
                         alt="RAG Agent Service"
@@ -700,7 +778,10 @@ const App = () => {
                   </div>
 
                   <div className="mt-8">
-                    <div className="cursor-pointer group relative" onClick={() => openLightbox("Deployment-service.png")}>
+                    <div
+                      className="cursor-pointer group relative"
+                      onClick={() => openLightbox("Deployment-service.png")}
+                    >
                       <img
                         src="Deployment-service.png"
                         alt="Deployment"
