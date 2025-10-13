@@ -740,10 +740,19 @@ const App = () => {
                 </h3>
                 <p className="text-gray-400 leading-relaxed text-sm sm:text-base md:text-lg">
                   During sports auctions at our institute, the excitement was
-                  real, but so was the <strong className="text-white font-semibold">confusion</strong>. Volunteers tried to track
-                  every bid, but updates were either <strong className="text-white font-semibold">delayed or inconsistent</strong>. By
-                  the time the auction ended, teams questioned <strong className="text-white font-semibold">who won which
-                  player</strong>, and players weren't sure where they landed.
+                  real, but so was the{" "}
+                  <strong className="text-white font-semibold">
+                    confusion
+                  </strong>
+                  . Volunteers tried to track every bid, but updates were either{" "}
+                  <strong className="text-white font-semibold">
+                    delayed or inconsistent
+                  </strong>
+                  . By the time the auction ended, teams questioned{" "}
+                  <strong className="text-white font-semibold">
+                    who won which player
+                  </strong>
+                  , and players weren't sure where they landed.
                 </p>
               </div>
 
@@ -752,11 +761,31 @@ const App = () => {
                   The Solution
                 </h3>
                 <p className="text-gray-400 leading-relaxed text-sm sm:text-base md:text-lg">
-                  SportsSync creates a <strong className="text-white font-semibold">centralized platform</strong> for managing sports
-                  auctions efficiently. It ensures <strong className="text-white font-semibold">complete transparency</strong> by
-                  displaying <strong className="text-white font-semibold">final bid amounts</strong> and <strong className="text-white font-semibold">team assignments</strong>, with data
-                  seamlessly flowing into the <strong className="text-white font-semibold">Live Score Service</strong> for <strong className="text-white font-semibold">real-time
-                  match management</strong>.
+                  SportsSync creates a{" "}
+                  <strong className="text-white font-semibold">
+                    centralized platform
+                  </strong>{" "}
+                  for managing sports auctions efficiently. It ensures{" "}
+                  <strong className="text-white font-semibold">
+                    complete transparency
+                  </strong>{" "}
+                  by displaying{" "}
+                  <strong className="text-white font-semibold">
+                    final bid amounts
+                  </strong>{" "}
+                  and{" "}
+                  <strong className="text-white font-semibold">
+                    team assignments
+                  </strong>
+                  , with data seamlessly flowing into the{" "}
+                  <strong className="text-white font-semibold">
+                    Live Score Service
+                  </strong>{" "}
+                  for{" "}
+                  <strong className="text-white font-semibold">
+                    real-time match management
+                  </strong>
+                  .
                 </p>
               </div>
             </div>
@@ -828,10 +857,28 @@ const App = () => {
                         </h3>
                       </div>
                       <p className="text-sm sm:text-base md:text-lg text-gray-400 leading-relaxed">
-                        Manages user <strong className="text-white font-semibold">sign-up</strong>, <strong className="text-white font-semibold">login</strong>, and <strong className="text-white font-semibold">Google OAuth 2.0</strong> integration. 
-                        Issues and validates <strong className="text-white font-semibold">JWTs</strong> for securing all
-                        other services. Stores authentication details and
-                        refresh tokens in <strong className="text-white font-semibold">Postgres</strong>.
+                        Manages user{" "}
+                        <strong className="text-white font-semibold">
+                          sign-up
+                        </strong>
+                        ,{" "}
+                        <strong className="text-white font-semibold">
+                          login
+                        </strong>
+                        , and{" "}
+                        <strong className="text-white font-semibold">
+                          Google OAuth 2.0
+                        </strong>{" "}
+                        integration. Issues and validates{" "}
+                        <strong className="text-white font-semibold">
+                          JWTs
+                        </strong>{" "}
+                        for securing all other services. Stores authentication
+                        details and refresh tokens in{" "}
+                        <strong className="text-white font-semibold">
+                          Postgres
+                        </strong>
+                        .
                       </p>
                     </div>
                   </div>
@@ -888,9 +935,20 @@ const App = () => {
                         </h3>
                       </div>
                       <p className="text-sm sm:text-base md:text-lg text-gray-400 leading-relaxed">
-                        Central <strong className="text-white font-semibold">user profile repository</strong> storing basic user data
-                        and allowing <strong className="text-white font-semibold">profile updates</strong> (bio, avatar) after initial
-                        creation. Stores user profile data in <strong className="text-white font-semibold">Postgres</strong>.
+                        Central{" "}
+                        <strong className="text-white font-semibold">
+                          user profile repository
+                        </strong>{" "}
+                        storing basic user data and allowing{" "}
+                        <strong className="text-white font-semibold">
+                          profile updates
+                        </strong>{" "}
+                        (bio, avatar) after initial creation. Stores user
+                        profile data in{" "}
+                        <strong className="text-white font-semibold">
+                          Postgres
+                        </strong>
+                        .
                       </p>
                     </div>
                   </div>
@@ -932,10 +990,23 @@ const App = () => {
                         </h3>
                       </div>
                       <p className="text-sm sm:text-base md:text-lg text-gray-400 leading-relaxed">
-                        Handles <strong className="text-white font-semibold">creation and scheduling</strong> of sporting events.
-                        Manages user registration as <strong className="text-white font-semibold">player or owner</strong> and
-                        publishes participant data to <strong className="text-white font-semibold">RabbitMQ</strong>. Stores event
-                        data in <strong className="text-white font-semibold">MongoDB</strong>.
+                        Handles{" "}
+                        <strong className="text-white font-semibold">
+                          creation and scheduling
+                        </strong>{" "}
+                        of sporting events. Manages user registration as{" "}
+                        <strong className="text-white font-semibold">
+                          player or owner
+                        </strong>{" "}
+                        and publishes participant data to{" "}
+                        <strong className="text-white font-semibold">
+                          RabbitMQ
+                        </strong>
+                        . Stores event data in{" "}
+                        <strong className="text-white font-semibold">
+                          MongoDB
+                        </strong>
+                        .
                       </p>
                     </div>
                   </div>
@@ -977,11 +1048,35 @@ const App = () => {
                         </h3>
                       </div>
                       <p className="text-sm sm:text-base md:text-lg text-gray-400 leading-relaxed">
-                        Consumes participant messages from <strong className="text-white font-semibold">RabbitMQ</strong> for live
-                        player auctions. Uses <strong className="text-white font-semibold">Socket.IO</strong> for <strong className="text-white font-semibold">real-time bid
-                        updates</strong> and <strong className="text-white font-semibold">Redis</strong> for quick access. Bidding handled
-                        through <strong className="text-white font-semibold">Redis + Lua atomic script</strong> ensuring <strong className="text-white font-semibold">FCFS
-                        fairness</strong>. Stores data in <strong className="text-white font-semibold">MongoDB</strong>.
+                        Consumes participant messages from{" "}
+                        <strong className="text-white font-semibold">
+                          RabbitMQ
+                        </strong>{" "}
+                        for live player auctions. Uses{" "}
+                        <strong className="text-white font-semibold">
+                          Socket.IO
+                        </strong>{" "}
+                        for{" "}
+                        <strong className="text-white font-semibold">
+                          real-time bid updates
+                        </strong>{" "}
+                        and{" "}
+                        <strong className="text-white font-semibold">
+                          Redis
+                        </strong>{" "}
+                        for quick access. Bidding handled through{" "}
+                        <strong className="text-white font-semibold">
+                          Redis + Lua atomic script
+                        </strong>{" "}
+                        ensuring{" "}
+                        <strong className="text-white font-semibold">
+                          FCFS fairness
+                        </strong>
+                        . Stores data in{" "}
+                        <strong className="text-white font-semibold">
+                          MongoDB
+                        </strong>
+                        .
                       </p>
                     </div>
                   </div>
@@ -1038,10 +1133,27 @@ const App = () => {
                         </h3>
                       </div>
                       <p className="text-sm sm:text-base md:text-lg text-gray-400 leading-relaxed">
-                        Provides <strong className="text-white font-semibold">real-time score updates</strong> using <strong className="text-white font-semibold">Socket.IO</strong>.
-                        Prioritizes <strong className="text-white font-semibold">Redis cache</strong> for fast retrieval and fetches
-                        <strong className="text-white font-semibold">team rosters</strong> from Auction Service. Stores match data in
-                        <strong className="text-white font-semibold">MongoDB</strong>.
+                        Provides{" "}
+                        <strong className="text-white font-semibold">
+                          real-time score updates
+                        </strong>{" "}
+                        using{" "}
+                        <strong className="text-white font-semibold">
+                          Socket.IO
+                        </strong>
+                        . Prioritizes{" "}
+                        <strong className="text-white font-semibold">
+                          Redis cache
+                        </strong>{" "}
+                        for fast retrieval and fetches
+                        <strong className="text-white font-semibold">
+                          team rosters
+                        </strong>{" "}
+                        from Auction Service. Stores match data in
+                        <strong className="text-white font-semibold">
+                          MongoDB
+                        </strong>
+                        .
                       </p>
                     </div>
                   </div>
@@ -1083,9 +1195,26 @@ const App = () => {
                         </h3>
                       </div>
                       <p className="text-sm sm:text-base md:text-lg text-gray-400 leading-relaxed">
-                        <strong className="text-white font-semibold">Q&A layer</strong> using <strong className="text-white font-semibold">LangChain and LLMs</strong> to generate insights
-                        from system data. Accesses <strong className="text-white font-semibold">all service databases</strong> and
-                        uses <strong className="text-white font-semibold">Pinecone</strong> for <strong className="text-white font-semibold">semantic search</strong> capabilities.
+                        <strong className="text-white font-semibold">
+                          Q&A layer
+                        </strong>{" "}
+                        using{" "}
+                        <strong className="text-white font-semibold">
+                          LangChain and LLMs
+                        </strong>{" "}
+                        to generate insights from system data. Accesses{" "}
+                        <strong className="text-white font-semibold">
+                          all service databases
+                        </strong>{" "}
+                        and uses{" "}
+                        <strong className="text-white font-semibold">
+                          Pinecone
+                        </strong>{" "}
+                        for{" "}
+                        <strong className="text-white font-semibold">
+                          semantic search
+                        </strong>{" "}
+                        capabilities.
                       </p>
                     </div>
                   </div>
@@ -1127,10 +1256,31 @@ const App = () => {
                         </h3>
                       </div>
                       <p className="text-sm sm:text-base md:text-lg text-gray-400 leading-relaxed">
-                        Deployment handled by <strong className="text-white font-semibold">Docker</strong> and orchestrated by <strong className="text-white font-semibold">AWS
-                        EKS</strong>. Automated using <strong className="text-white font-semibold">Jenkins CI/CD pipeline</strong>, pushing to
-                        <strong className="text-white font-semibold">DockerHub</strong> with <strong className="text-white font-semibold">ArgoCD</strong> managing deployment. Monitored by
-                        <strong className="text-white font-semibold">Prometheus and Grafana</strong>.
+                        Deployment handled by{" "}
+                        <strong className="text-white font-semibold">
+                          Docker
+                        </strong>{" "}
+                        and orchestrated by{" "}
+                        <strong className="text-white font-semibold">
+                          AWS EKS
+                        </strong>
+                        . Automated using{" "}
+                        <strong className="text-white font-semibold">
+                          Jenkins CI/CD pipeline
+                        </strong>
+                        , pushing to
+                        <strong className="text-white font-semibold">
+                          DockerHub
+                        </strong>{" "}
+                        with{" "}
+                        <strong className="text-white font-semibold">
+                          ArgoCD
+                        </strong>{" "}
+                        managing deployment. Monitored by
+                        <strong className="text-white font-semibold">
+                          Prometheus and Grafana
+                        </strong>
+                        .
                       </p>
                     </div>
                   </div>
