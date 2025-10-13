@@ -1,593 +1,953 @@
 import React, { useEffect, useState } from "react";
+import {
+  Menu,
+  X,
+  Github,
+  Linkedin,
+  Mail,
+  Phone,
+  ExternalLink,
+  Server,
+  Database,
+  Lock,
+  ShoppingCart,
+  Radio,
+  Bot,
+  Cloud,
+  Settings,
+  Code,
+  Layers,
+  Container,
+  GitBranch,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 
 const App = () => {
   const [scrollY, setScrollY] = useState(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Define all architecture images with metadata
+  const architectureImages = [
+    { src: "High-level.png", title: "High-Level Architecture", description: "System overview" },
+    { src: "Auth-service.png", title: "Auth Service", description: "Authentication flow" },
+    { src: "Google-Oauth-2.0.png", title: "OAuth 2.0", description: "Google OAuth integration" },
+    { src: "user-service.png", title: "User Service", description: "User profile management" },
+    { src: "Event-service.png", title: "Event Service", description: "Event creation and scheduling" },
+    { src: "Auction-service.png", title: "Auction Service", description: "Live auction management" },
+    { src: "Bidding.png", title: "Bidding Flow", description: "Redis + Lua bidding logic" },
+    { src: "Live-score-service.png", title: "Live Score Service", description: "Real-time score updates" },
+    { src: "Cron-Jobs.png", title: "RAG Agent Service", description: "AI-powered Q&A layer" },
+    { src: "Deployment-service.png", title: "Deployment", description: "CI/CD pipeline" },
+  ];
 
   useEffect(() => {
-    // Scroll handling is fine as-is
     const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Keyboard navigation for lightbox
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (!lightboxOpen) return;
+      
+      if (e.key === "Escape") {
+        setLightboxOpen(false);
+      } else if (e.key === "ArrowLeft") {
+        navigateImage("prev");
+      } else if (e.key === "ArrowRight") {
+        navigateImage("next");
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
+  }, [lightboxOpen, currentImageIndex]);
+
+  const openLightbox = (imageSrc) => {
+    const index = architectureImages.findIndex(img => img.src === imageSrc);
+    if (index !== -1) {
+      setCurrentImageIndex(index);
+      setLightboxOpen(true);
+      document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    }
+  };
+
+  const closeLightbox = () => {
+    setLightboxOpen(false);
+    document.body.style.overflow = 'unset';
+  };
+
+  const navigateImage = (direction) => {
+    if (direction === "next") {
+      setCurrentImageIndex((prev) => (prev + 1) % architectureImages.length);
+    } else {
+      setCurrentImageIndex((prev) => (prev - 1 + architectureImages.length) % architectureImages.length);
+    }
+  };
+
+  const scrollToSection = (id) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    setMobileMenuOpen(false);
+  };
+
   return (
-    <div className="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-gray-100 min-h-screen font-sans relative overflow-hidden">
-      {/* Animated background elements (no change needed) */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 -left-48 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div
-          className="absolute bottom-1/4 -right-48 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse"
-          style={{ animationDelay: "1s" }}
-        ></div>
-        <div
-          className="absolute top-3/4 left-1/3 w-64 h-64 bg-pink-500/10 rounded-full blur-3xl animate-pulse"
-          style={{ animationDelay: "2s" }}
-        ></div>
-      </div>
+    <div className="bg-black text-white min-h-screen relative">
+      {/* Subtle gradient overlay - minimal */}
+      <div className="fixed inset-0 bg-gradient-to-br from-neutral-950 via-black to-neutral-950 pointer-events-none opacity-60"></div>
 
-      {/* Main Content Container: Adjusted padding for smaller screens */}
-      <div className="relative z-10 p-4 sm:p-8 flex flex-col items-center">
-        {/* Header */}
-        <header
-          // Reduced vertical margin for mobile
-          className="my-10 sm:my-20 flex flex-col items-center"
-          style={{ transform: `translateY(${scrollY * 0.1}px)` }}
-        >
-          <div className="relative mb-8 sm:mb-12 group">
-            <div className="absolute -inset-2 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full blur-xl opacity-50 group-hover:opacity-75 transition duration-500"></div>
-            <img
-              src="sportsync_logo.jpg"
-              alt="SportsSync Logo"
-              // Adjusted size for mobile
-              className="relative w-24 h-24 sm:w-36 sm:h-36 rounded-full shadow-2xl transform transition-transform duration-500 group-hover:scale-110"
-            />
+      {/* Navigation */}
+      <nav
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          scrollY > 50 ? "glass-dark shadow-lg" : ""
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <img
+                src="sportsync_logo.jpg"
+                alt="Logo"
+                className="w-10 h-10 rounded-full ring-2 ring-white/10"
+              />
+              <span className="text-xl font-semibold tracking-tight">
+                SportsSync Engineering
+              </span>
+            </div>
+
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center gap-8">
+              <button
+                onClick={() => scrollToSection("overview")}
+                className="text-sm hover:text-gray-300 transition"
+              >
+                Overview
+              </button>
+              <button
+                onClick={() => scrollToSection("architecture")}
+                className="text-sm hover:text-gray-300 transition"
+              >
+                Architecture
+              </button>
+              <button
+                onClick={() => scrollToSection("services")}
+                className="text-sm hover:text-gray-300 transition"
+              >
+                Services
+              </button>
+              <button
+                onClick={() => scrollToSection("stack")}
+                className="text-sm hover:text-gray-300 transition"
+              >
+                Tech Stack
+              </button>
+              <button
+                onClick={() => scrollToSection("contact")}
+                className="text-sm hover:text-gray-300 transition"
+              >
+                Contact
+              </button>
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 hover:bg-white/5 rounded-lg transition"
+            >
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
           </div>
-          <h1
-            // Significantly reduced font size on mobile (text-4xl)
-            className="text-4xl sm:text-7xl font-black text-center tracking-tight leading-snug sm:leading-tight mb-4"
-            style={{
-              fontFamily: "'Inter', 'SF Pro Display', system-ui, sans-serif",
-            }}
-          >
-            Engineering behind{" "}
-            <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 text-transparent bg-clip-text animate-pulse">
-              SportsSync
-            </span>
-          </h1>
-          <div className="w-16 sm:w-24 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full"></div>
-        </header>
 
-        {/* Warming up */}
-        <section className="mb-16 sm:mb-24 text-center max-w-4xl">
-          <h2
-            // Reduced font size on mobile (text-3xl)
-            className="text-3xl sm:text-5xl font-bold mb-6 sm:mb-8 bg-gradient-to-r from-yellow-300 to-orange-400 text-transparent bg-clip-text"
-            style={{
-              fontFamily: "'Inter', 'SF Pro Display', system-ui, sans-serif",
-            }}
-          >
-            Setting the stage: What, Why, and How?
-          </h2>
+          {/* Mobile Menu */}
+          {mobileMenuOpen && (
+            <div className="md:hidden mt-4 glass-dark rounded-lg p-4 space-y-3">
+              <button
+                onClick={() => scrollToSection("overview")}
+                className="block w-full text-left py-2 hover:text-gray-300"
+              >
+                Overview
+              </button>
+              <button
+                onClick={() => scrollToSection("architecture")}
+                className="block w-full text-left py-2 hover:text-gray-300"
+              >
+                Architecture
+              </button>
+              <button
+                onClick={() => scrollToSection("services")}
+                className="block w-full text-left py-2 hover:text-gray-300"
+              >
+                Services
+              </button>
+              <button
+                onClick={() => scrollToSection("stack")}
+                className="block w-full text-left py-2 hover:text-gray-300"
+              >
+                Tech Stack
+              </button>
+              <button
+                onClick={() => scrollToSection("contact")}
+                className="block w-full text-left py-2 hover:text-gray-300"
+              >
+                Contact
+              </button>
+            </div>
+          )}
+        </div>
+      </nav>
 
-          <p
-            // Reduced font size on mobile (text-lg)
-            className="text-lg sm:text-xl text-gray-300 leading-relaxed px-2"
-            style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
+      {/* Image Lightbox Modal */}
+      {lightboxOpen && (
+        <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex items-center justify-center">
+          {/* Close button */}
+          <button
+            onClick={closeLightbox}
+            className="absolute top-6 right-6 w-12 h-12 glass-dark rounded-full flex items-center justify-center hover:bg-white/10 transition-all group z-10"
+            aria-label="Close lightbox"
           >
-            First, I will cover the problem this application aims to solve. Then
-            we move quickly to the high-level design. After that, we will see
-            the architecture of all the micro-services and finally the tech
-            stack.
-          </p>
-        </section>
+            <X size={24} className="group-hover:scale-110 transition-transform" />
+          </button>
 
-        {/* Problem */}
-        <section className="mb-16 sm:mb-24 max-w-4xl px-2">
-          <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-3xl p-6 sm:p-12 border border-slate-700/50 shadow-2xl">
-            <h2
-              // Reduced font size on mobile (text-3xl)
-              className="text-3xl sm:text-4xl font-bold mb-6 sm:mb-8 text-center bg-gradient-to-r from-cyan-300 to-blue-400 text-transparent bg-clip-text"
-              style={{
-                fontFamily: "'Inter', 'SF Pro Display', system-ui, sans-serif",
-              }}
-            >
-              In our institute...
-            </h2>
-            <div
-              // Reduced font size on mobile (text-base)
-              className="space-y-6 text-base sm:text-lg text-gray-300 leading-relaxed"
-              style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
-            >
-              <p>
-                During sports auctions at our institute, the excitement was
-                real, but so was the confusion. Volunteers tried to track every
-                bid, but updates were either delayed or inconsistent. By the
-                time the auction ended, teams sometimes questioned who won which
-                player, and players weren't sure where they landed.
+          {/* Image counter */}
+          <div className="absolute top-6 left-6 glass-dark px-4 py-2 rounded-full text-sm font-mono">
+            {currentImageIndex + 1} / {architectureImages.length}
+          </div>
+
+          {/* Previous button */}
+          <button
+            onClick={() => navigateImage("prev")}
+            className="absolute left-6 w-14 h-14 glass-dark rounded-full flex items-center justify-center hover:bg-white/10 transition-all group"
+            aria-label="Previous image"
+          >
+            <ChevronLeft size={28} className="group-hover:-translate-x-1 transition-transform" />
+          </button>
+
+          {/* Next button */}
+          <button
+            onClick={() => navigateImage("next")}
+            className="absolute right-6 w-14 h-14 glass-dark rounded-full flex items-center justify-center hover:bg-white/10 transition-all group"
+            aria-label="Next image"
+          >
+            <ChevronRight size={28} className="group-hover:translate-x-1 transition-transform" />
+          </button>
+
+          {/* Image container */}
+          <div className="max-w-7xl mx-auto px-20 w-full">
+            <div className="text-center mb-6">
+              <h3 className="text-2xl font-bold mb-2">
+                {architectureImages[currentImageIndex].title}
+              </h3>
+              <p className="text-gray-400">
+                {architectureImages[currentImageIndex].description}
               </p>
-              <p>
-                The main goal behind building{" "}
-                <span className="text-yellow-300 font-bold">SportsSync </span>
-                was to create a centralized platform for managing sports
-                auctions efficiently. It ensures complete transparency by
-                displaying the final bid amount for each player and clearly
-                showing which team has drafted which player — eliminating any
-                confusion. Once the auction concludes, all the data seamlessly
-                flows into the
-                <span className="text-yellow-300 font-bold">
-                  {" "}
-                  Live Score Service
-                </span>
-                , where the admin can easily create and manage matches between
-                the teams in real time.
-              </p>
+            </div>
+            
+            <div className="relative">
+              <img
+                src={architectureImages[currentImageIndex].src}
+                alt={architectureImages[currentImageIndex].title}
+                className="w-full h-auto max-h-[70vh] object-contain rounded-xl"
+              />
+            </div>
+
+            {/* Thumbnail navigation */}
+            <div className="flex gap-2 mt-6 overflow-x-auto pb-2 scrollbar-thin justify-center">
+              {architectureImages.map((img, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentImageIndex(idx)}
+                  className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                    idx === currentImageIndex
+                      ? "border-white scale-110"
+                      : "border-white/20 opacity-50 hover:opacity-100"
+                  }`}
+                >
+                  <img
+                    src={img.src}
+                    alt={img.title}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Keyboard shortcuts hint */}
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 glass-dark px-4 py-2 rounded-full text-xs text-gray-400">
+            Use arrow keys or swipe to navigate • ESC to close
+          </div>
+        </div>
+      )}
+
+      {/* Main Content */}
+      <div className="relative z-10">
+        {/* Hero Section */}
+        <section className="min-h-screen flex items-center justify-center px-6 pt-20">
+          <div className="max-w-5xl mx-auto text-center">
+            <div className="mb-8 inline-block">
+              <img
+                src="sportsync_logo.jpg"
+                alt="SportsSync"
+                className="w-32 h-32 rounded-full mx-auto ring-4 ring-white/10"
+              />
+            </div>
+
+            <h1 className="text-6xl md:text-8xl font-bold tracking-tight mb-6">
+              Engineering behind
+              <br />
+              <span className="text-gray-400">SportsSync</span>
+            </h1>
+
+            <p className="text-xl md:text-2xl text-gray-400 max-w-3xl mx-auto leading-relaxed">
+              A scalable microservices architecture for real-time sports auction
+              management
+            </p>
+
+            <div className="mt-12 flex flex-wrap justify-center gap-4">
+              <a
+                href="#overview"
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollToSection("overview");
+                }}
+                className="px-8 py-4 bg-white text-black font-medium rounded-lg hover:bg-gray-200 transition"
+              >
+                Explore Architecture
+              </a>
+              <a
+                href="https://github.com/kaustubhduse/SportSync"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-8 py-4 glass border border-white/10 font-medium rounded-lg hover:bg-white/10 transition inline-flex items-center gap-2"
+              >
+                <Github size={20} />
+                View on GitHub
+              </a>
             </div>
           </div>
         </section>
 
-        {/* High-level Design */}
-        <section className="mb-16 sm:mb-24 w-full max-w-7xl px-2">
-          <h2
-            // Reduced font size on mobile (text-3xl)
-            className="text-3xl sm:text-4xl font-bold mb-6 sm:mb-8 text-center bg-gradient-to-r from-green-300 to-emerald-400 text-transparent bg-clip-text"
-            style={{
-              fontFamily: "'Inter', 'SF Pro Display', system-ui, sans-serif",
-            }}
-          >
-            High-Level Diagram
-          </h2>
-          <p
-            // Reduced font size on mobile (text-lg)
-            className="mb-6 sm:mb-8 text-center text-lg sm:text-xl text-gray-300"
-            style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
-          >
-            Here is a high-level diagram of how SportsSync works:
-          </p>
-          <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm p-4 sm:p-8 rounded-3xl border border-slate-700/50 shadow-2xl flex justify-center items-center hover:border-slate-600/50 transition-all duration-300">
-            <img
-              src="High-level.png"
-              alt="High-Level Diagram"
-              className="w-full h-auto max-h-[70vh] sm:max-h-[90vh] rounded-2xl object-contain shadow-xl"
-            />
+        {/* Overview Section */}
+        <section id="overview" className="py-32 px-6">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-5xl md:text-6xl font-bold mb-6">
+                The Challenge
+              </h2>
+              <div className="w-20 h-1 bg-white mx-auto"></div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8">
+              <div className="glass-dark p-12 rounded-2xl">
+                <h3 className="text-2xl font-semibold mb-4">The Problem</h3>
+                <p className="text-gray-400 leading-relaxed text-lg">
+                  During sports auctions at our institute, the excitement was
+                  real, but so was the confusion. Volunteers tried to track
+                  every bid, but updates were either delayed or inconsistent. By
+                  the time the auction ended, teams questioned who won which
+                  player, and players weren't sure where they landed.
+                </p>
+              </div>
+
+              <div className="glass-dark p-12 rounded-2xl">
+                <h3 className="text-2xl font-semibold mb-4">The Solution</h3>
+                <p className="text-gray-400 leading-relaxed text-lg">
+                  SportsSync creates a centralized platform for managing sports
+                  auctions efficiently. It ensures complete transparency by
+                  displaying final bid amounts and team assignments, with data
+                  seamlessly flowing into the Live Score Service for real-time
+                  match management.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Architecture Diagram */}
+        <section id="architecture" className="py-32 px-6 bg-neutral-950/50">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-5xl md:text-6xl font-bold mb-6">
+                System Architecture
+              </h2>
+              <div className="w-20 h-1 bg-white mx-auto mb-8"></div>
+              <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+                High-level overview of the microservices architecture powering
+                SportsSync
+              </p>
+            </div>
+
+            <div className="glass-dark p-8 rounded-2xl cursor-pointer hover:border-white/20 transition-all group"
+                 onClick={() => openLightbox("High-level.png")}>
+              <img
+                src="High-level.png"
+                alt="Architecture Diagram"
+                className="w-full h-auto rounded-xl group-hover:scale-[1.02] transition-transform"
+              />
+              <div className="text-center mt-4 text-sm text-gray-400 group-hover:text-white transition-colors">
+                Click to view full size
+              </div>
+            </div>
           </div>
         </section>
 
         {/* Microservices */}
-        <section className="mb-16 sm:mb-24 w-full max-w-6xl px-2">
-          <h2
-            // Reduced font size on mobile (text-4xl)
-            className="text-4xl sm:text-5xl font-bold mb-10 sm:mb-16 text-center bg-gradient-to-r from-violet-300 to-fuchsia-400 text-transparent bg-clip-text"
-            style={{
-              fontFamily: "'Inter', 'SF Pro Display', system-ui, sans-serif",
-            }}
-          >
-            Microservices Architecture
-          </h2>
-
-          <div className="space-y-12 sm:space-y-20">
-            {/* Auth Service */}
-            <div className="bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm rounded-3xl p-6 sm:p-10 border border-slate-700/50 shadow-2xl hover:border-blue-500/30 transition-all duration-300">
-              <div className="flex items-center gap-4 mb-4 sm:mb-6">
-                <span className="text-4xl sm:text-5xl font-black text-blue-400">01</span>
-                <h3
-                  className="text-2xl sm:text-3xl font-bold text-blue-300"
-                  style={{
-                    fontFamily:
-                      "'Inter', 'SF Pro Display', system-ui, sans-serif",
-                  }}
-                >
-                  Auth-Service
-                </h3>
-              </div>
-              <p
-                className="mb-6 sm:mb-8 text-base sm:text-lg text-gray-300 leading-relaxed"
-                style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
-              >
-                Manages user sign-up, login, and Google OAuth 2.0 integration.
-                Its main job is to issue and validate JWTs for securing all
-                other services. Stores user authentication details and refresh
-                tokens in Postgres.
+        <section id="services" className="py-32 px-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-20">
+              <h2 className="text-5xl md:text-6xl font-bold mb-6">
+                Microservices
+              </h2>
+              <div className="w-20 h-1 bg-white mx-auto mb-8"></div>
+              <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+                Seven specialized services working together to deliver a
+                seamless experience
               </p>
-
-              {/* Stack images vertically on small screens, side-by-side on larger */}
-              <div className="flex flex-col sm:flex-row justify-center items-start gap-4 sm:gap-6 w-full">
-                <img
-                  src="Auth-service.png"
-                  alt="Auth Service Flow"
-                  // Added w-full for mobile, adjusted w-[48%] for sm:
-                  className="w-full sm:w-[48%] h-auto rounded-2xl shadow-2xl border border-slate-700/50 hover:scale-[1.02] transition-transform duration-300"
-                />
-                <img
-                  src="Google-Oauth-2.0.png"
-                  alt="Auth Service Database Diagram"
-                  // Added w-full for mobile, adjusted w-[48%] for sm:
-                  className="w-full sm:w-[48%] h-auto rounded-2xl shadow-2xl border border-slate-700/50 hover:scale-[1.02] transition-transform duration-300"
-                />
-              </div>
             </div>
 
-            {/* User Service (Applied responsiveness to p and h3) */}
-            <div className="bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm rounded-3xl p-6 sm:p-10 border border-slate-700/50 shadow-2xl hover:border-purple-500/30 transition-all duration-300">
-              <div className="flex items-center gap-4 mb-4 sm:mb-6">
-                <span className="text-4xl sm:text-5xl font-black text-purple-400">02</span>
-                <h3
-                  className="text-2xl sm:text-3xl font-bold text-purple-300"
-                  style={{
-                    fontFamily:
-                      "'Inter', 'SF Pro Display', system-ui, sans-serif",
-                  }}
-                >
-                  User-Service
-                </h3>
-              </div>
-              <p
-                className="mb-6 sm:mb-8 text-base sm:text-lg text-gray-300 leading-relaxed"
-                style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
-              >
-                Acts as the central user profile repository for the entire
-                application. It stores basic user data and allows profile
-                updates (bio, avatar) after the initial creation request from
-                the Auth Service. Stores user profile data in Postgres.
-              </p>
-              <img
-                src="user-service.png"
-                alt="User Service Diagram"
-                className="w-full h-auto rounded-2xl mx-auto shadow-2xl border border-slate-700/50 hover:scale-[1.01] transition-transform duration-300"
-              />
-            </div>
+            <div className="space-y-8">
+              {/* Auth Service */}
+              <div className="glass-dark rounded-2xl overflow-hidden border border-white/5 hover:border-white/10 transition-all">
+                <div className="p-8 md:p-12">
+                  <div className="flex items-start gap-6 mb-6">
+                    <div className="flex-shrink-0 w-16 h-16 bg-blue-500/10 rounded-xl flex items-center justify-center">
+                      <Lock className="text-blue-400" size={32} />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="text-sm font-mono text-gray-500">
+                          01
+                        </span>
+                        <h3 className="text-3xl font-bold">Auth Service</h3>
+                      </div>
+                      <p className="text-lg text-gray-400 leading-relaxed">
+                        Manages user sign-up, login, and Google OAuth 2.0
+                        integration. Issues and validates JWTs for securing all
+                        other services. Stores authentication details and
+                        refresh tokens in Postgres.
+                      </p>
+                    </div>
+                  </div>
 
-            {/* Event Service (Applied responsiveness to p and h3) */}
-            <div className="bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm rounded-3xl p-6 sm:p-10 border border-slate-700/50 shadow-2xl hover:border-green-500/30 transition-all duration-300">
-              <div className="flex items-center gap-4 mb-4 sm:mb-6">
-                <span className="text-4xl sm:text-5xl font-black text-green-400">03</span>
-                <h3
-                  className="text-2xl sm:text-3xl font-bold text-green-300"
-                  style={{
-                    fontFamily:
-                      "'Inter', 'SF Pro Display', system-ui, sans-serif",
-                  }}
-                >
-                  Event-Service
-                </h3>
+                  <div className="grid md:grid-cols-2 gap-4 mt-8">
+                    <div className="cursor-pointer group relative" onClick={() => openLightbox("Auth-service.png")}>
+                      <img
+                        src="Auth-service.png"
+                        alt="Auth Service"
+                        className="w-full rounded-xl border border-white/5 group-hover:border-white/20 transition-all"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all rounded-xl flex items-center justify-center">
+                        <span className="opacity-0 group-hover:opacity-100 text-sm bg-white/10 backdrop-blur px-4 py-2 rounded-lg transition-all">
+                          Click to enlarge
+                        </span>
+                      </div>
+                    </div>
+                    <div className="cursor-pointer group relative" onClick={() => openLightbox("Google-Oauth-2.0.png")}>
+                      <img
+                        src="Google-Oauth-2.0.png"
+                        alt="OAuth Flow"
+                        className="w-full rounded-xl border border-white/5 group-hover:border-white/20 transition-all"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all rounded-xl flex items-center justify-center">
+                        <span className="opacity-0 group-hover:opacity-100 text-sm bg-white/10 backdrop-blur px-4 py-2 rounded-lg transition-all">
+                          Click to enlarge
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <p
-                className="mb-6 sm:mb-8 text-base sm:text-lg text-gray-300 leading-relaxed"
-                style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
-              >
-                Handles the creation and scheduling of sporting events by
-                administrators. It manages user registration as a player or
-                owner and publishes participant data to RabbitMQ for
-                asynchronous processing. Stores event data in MongoDB.
-              </p>
-              <img
-                src="Event-service.png"
-                alt="Event Service Diagram"
-                className="w-full h-auto rounded-2xl mx-auto shadow-2xl border border-slate-700/50 hover:scale-[1.01] transition-transform duration-300"
-              />
-            </div>
 
-            {/* Auction Service (Applied responsiveness to p and h3) */}
-            <div className="bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm rounded-3xl p-6 sm:p-10 border border-slate-700/50 shadow-2xl hover:border-yellow-500/30 transition-all duration-300">
-              <div className="flex items-center gap-4 mb-4 sm:mb-6">
-                <span className="text-4xl sm:text-5xl font-black text-yellow-400">04</span>
-                <h3
-                  className="text-2xl sm:text-3xl font-bold text-yellow-300"
-                  style={{
-                    fontFamily:
-                      "'Inter', 'SF Pro Display', system-ui, sans-serif",
-                  }}
-                >
-                  Auction-Service
-                </h3>
-              </div>
-              <p
-                className="mb-6 sm:mb-8 text-base sm:text-lg text-gray-300 leading-relaxed"
-                style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
-              >
-                Consumes participant messages from RabbitMQ and is responsible
-                for conducting the live player/team auction. It uses Socket.IO
-                for real-time bid updates and Redis for quick access to live
-                auction rosters. Stores auction data in MongoDB.
-              </p>
-              <img
-                src="Auction-service.png"
-                alt="Auction Service Diagram"
-                className="w-full h-auto rounded-2xl mx-auto shadow-2xl border border-slate-700/50 hover:scale-[1.01] transition-transform duration-300"
-              />
-            </div>
+              {/* User Service */}
+              <div className="glass-dark rounded-2xl overflow-hidden border border-white/5 hover:border-white/10 transition-all">
+                <div className="p-8 md:p-12">
+                  <div className="flex items-start gap-6 mb-6">
+                    <div className="flex-shrink-0 w-16 h-16 bg-purple-500/10 rounded-xl flex items-center justify-center">
+                      <Server className="text-purple-400" size={32} />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="text-sm font-mono text-gray-500">
+                          02
+                        </span>
+                        <h3 className="text-3xl font-bold">User Service</h3>
+                      </div>
+                      <p className="text-lg text-gray-400 leading-relaxed">
+                        Central user profile repository storing basic user data
+                        and allowing profile updates (bio, avatar) after initial
+                        creation. Stores user profile data in Postgres.
+                      </p>
+                    </div>
+                  </div>
 
-            {/* Live Score Service (Applied responsiveness to p and h3) */}
-            <div className="bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm rounded-3xl p-6 sm:p-10 border border-slate-700/50 shadow-2xl hover:border-red-500/30 transition-all duration-300">
-              <div className="flex items-center gap-4 mb-4 sm:mb-6">
-                <span className="text-4xl sm:text-5xl font-black text-red-400">05</span>
-                <h3
-                  className="text-2xl sm:text-3xl font-bold text-red-300"
-                  style={{
-                    fontFamily:
-                      "'Inter', 'SF Pro Display', system-ui, sans-serif",
-                  }}
-                >
-                  Live-Score-Service
-                </h3>
+                  <div className="mt-8">
+                    <div className="cursor-pointer group relative" onClick={() => openLightbox("user-service.png")}>
+                      <img
+                        src="user-service.png"
+                        alt="User Service"
+                        className="w-full rounded-xl border border-white/5 group-hover:border-white/20 transition-all"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all rounded-xl flex items-center justify-center">
+                        <span className="opacity-0 group-hover:opacity-100 text-sm bg-white/10 backdrop-blur px-4 py-2 rounded-lg transition-all">
+                          Click to enlarge
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <p
-                className="mb-6 sm:mb-8 text-base sm:text-lg text-gray-300 leading-relaxed"
-                style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
-              >
-                Provides real-time score updates for ongoing matches, relying on
-                Socket.IO to broadcast data to clients instantly. It prioritizes
-                Redis cache for fast retrieval and fetches finalized team
-                rosters from the Auction Service. Stores match score data in
-                MongoDB.
-              </p>
-              <img
-                src="Live-score-service.png"
-                alt="Live Score Service Diagram"
-                className="w-full h-auto rounded-2xl mx-auto shadow-2xl border border-slate-700/50 hover:scale-[1.01] transition-transform duration-300"
-              />
-            </div>
 
-            {/* RAG Agent Service (Applied responsiveness to p and h3) */}
-            <div className="bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm rounded-3xl p-6 sm:p-10 border border-slate-700/50 shadow-2xl hover:border-cyan-500/30 transition-all duration-300">
-              <div className="flex items-center gap-4 mb-4 sm:mb-6">
-                <span className="text-4xl sm:text-5xl font-black text-cyan-400">06</span>
-                <h3
-                  className="text-2xl sm:text-3xl font-bold text-cyan-300"
-                  style={{
-                    fontFamily:
-                      "'Inter', 'SF Pro Display', system-ui, sans-serif",
-                  }}
-                >
-                  RAG-Agent-Service
-                </h3>
-              </div>
-              <p
-                className="mb-6 sm:mb-8 text-base sm:text-lg text-gray-300 leading-relaxed"
-                style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
-              >
-                Acts as a Q&A layer for the entire system, using LangChain and
-                LLMs to generate insights from stored system data. It accesses
-                all service databases (Postgres and MongoDB) and uses Pinecone
-                for semantic search capabilities.
-              </p>
-              <img
-                src="Cron-Jobs.png"
-                alt="RAG Agent Service Diagram"
-                className="w-full h-auto rounded-2xl mx-auto shadow-2xl border border-slate-700/50 hover:scale-[1.01] transition-transform duration-300"
-              />
-            </div>
+              {/* Event Service */}
+              <div className="glass-dark rounded-2xl overflow-hidden border border-white/5 hover:border-white/10 transition-all">
+                <div className="p-8 md:p-12">
+                  <div className="flex items-start gap-6 mb-6">
+                    <div className="flex-shrink-0 w-16 h-16 bg-green-500/10 rounded-xl flex items-center justify-center">
+                      <Settings className="text-green-400" size={32} />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="text-sm font-mono text-gray-500">
+                          03
+                        </span>
+                        <h3 className="text-3xl font-bold">Event Service</h3>
+                      </div>
+                      <p className="text-lg text-gray-400 leading-relaxed">
+                        Handles creation and scheduling of sporting events.
+                        Manages user registration as player or owner and
+                        publishes participant data to RabbitMQ. Stores event
+                        data in MongoDB.
+                      </p>
+                    </div>
+                  </div>
 
-            {/* Deployment-side (Applied responsiveness to p and h3) */}
-            <div className="bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm rounded-3xl p-6 sm:p-10 border border-slate-700/50 shadow-2xl hover:border-cyan-500/30 transition-all duration-300">
-              <div className="flex items-center gap-4 mb-4 sm:mb-6">
-                <span className="text-4xl sm:text-5xl font-black text-cyan-400">07</span> {/* Updated index for clarity */}
-                <h3
-                  className="text-2xl sm:text-3xl font-bold text-cyan-300"
-                  style={{
-                    fontFamily:
-                      "'Inter', 'SF Pro Display', system-ui, sans-serif",
-                  }}
-                >
-                  Deployment-side
-                </h3>
+                  <div className="mt-8">
+                    <div className="cursor-pointer group relative" onClick={() => openLightbox("Event-service.png")}>
+                      <img
+                        src="Event-service.png"
+                        alt="Event Service"
+                        className="w-full rounded-xl border border-white/5 group-hover:border-white/20 transition-all"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all rounded-xl flex items-center justify-center">
+                        <span className="opacity-0 group-hover:opacity-100 text-sm bg-white/10 backdrop-blur px-4 py-2 rounded-lg transition-all">
+                          Click to enlarge
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <p
-                className="mb-6 sm:mb-8 text-base sm:text-lg text-gray-300 leading-relaxed"
-                style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
-              >
-                Microservices deployment is handled by Docker for
-                containerization and orchestrated by AWS EKS (Elastic Kubernetes
-                Service). The process is automated using a Jenkins CI/CD
-                pipeline, which pushes images to DockerHub and uses ArgoCD to
-                manage the continuous deployment to the EKS cluster. Prometheus
-                and Grafana provide monitoring for the running services.
-              </p>
-              <img
-                src="Deployment-service.png"
-                alt="Deployment Diagram"
-                className="w-full h-auto rounded-2xl mx-auto shadow-2xl border border-slate-700/50 hover:scale-[1.01] transition-transform duration-300"
-              />
+
+              {/* Auction Service */}
+              <div className="glass-dark rounded-2xl overflow-hidden border border-white/5 hover:border-white/10 transition-all">
+                <div className="p-8 md:p-12">
+                  <div className="flex items-start gap-6 mb-6">
+                    <div className="flex-shrink-0 w-16 h-16 bg-yellow-500/10 rounded-xl flex items-center justify-center">
+                      <ShoppingCart className="text-yellow-400" size={32} />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="text-sm font-mono text-gray-500">
+                          04
+                        </span>
+                        <h3 className="text-3xl font-bold">Auction Service</h3>
+                      </div>
+                      <p className="text-lg text-gray-400 leading-relaxed">
+                        Consumes participant messages from RabbitMQ for live
+                        player auctions. Uses Socket.IO for real-time bid
+                        updates and Redis for quick access. Bidding handled
+                        through Redis + Lua atomic script ensuring FCFS
+                        fairness. Stores data in MongoDB.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-4 mt-8">
+                    <div className="cursor-pointer group relative" onClick={() => openLightbox("Auction-service.png")}>
+                      <img
+                        src="Auction-service.png"
+                        alt="Auction Service"
+                        className="w-full rounded-xl border border-white/5 group-hover:border-white/20 transition-all"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all rounded-xl flex items-center justify-center">
+                        <span className="opacity-0 group-hover:opacity-100 text-sm bg-white/10 backdrop-blur px-4 py-2 rounded-lg transition-all">
+                          Click to enlarge
+                        </span>
+                      </div>
+                    </div>
+                    <div className="cursor-pointer group relative" onClick={() => openLightbox("Bidding.png")}>
+                      <img
+                        src="Bidding.png"
+                        alt="Bidding Flow"
+                        className="w-full rounded-xl border border-white/5 group-hover:border-white/20 transition-all"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all rounded-xl flex items-center justify-center">
+                        <span className="opacity-0 group-hover:opacity-100 text-sm bg-white/10 backdrop-blur px-4 py-2 rounded-lg transition-all">
+                          Click to enlarge
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Live Score Service */}
+              <div className="glass-dark rounded-2xl overflow-hidden border border-white/5 hover:border-white/10 transition-all">
+                <div className="p-8 md:p-12">
+                  <div className="flex items-start gap-6 mb-6">
+                    <div className="flex-shrink-0 w-16 h-16 bg-red-500/10 rounded-xl flex items-center justify-center">
+                      <Radio className="text-red-400" size={32} />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="text-sm font-mono text-gray-500">
+                          05
+                        </span>
+                        <h3 className="text-3xl font-bold">
+                          Live Score Service
+                        </h3>
+                      </div>
+                      <p className="text-lg text-gray-400 leading-relaxed">
+                        Provides real-time score updates using Socket.IO.
+                        Prioritizes Redis cache for fast retrieval and fetches
+                        team rosters from Auction Service. Stores match data in
+                        MongoDB.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-8">
+                    <div className="cursor-pointer group relative" onClick={() => openLightbox("Live-score-service.png")}>
+                      <img
+                        src="Live-score-service.png"
+                        alt="Live Score Service"
+                        className="w-full rounded-xl border border-white/5 group-hover:border-white/20 transition-all"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all rounded-xl flex items-center justify-center">
+                        <span className="opacity-0 group-hover:opacity-100 text-sm bg-white/10 backdrop-blur px-4 py-2 rounded-lg transition-all">
+                          Click to enlarge
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* RAG Agent Service */}
+              <div className="glass-dark rounded-2xl overflow-hidden border border-white/5 hover:border-white/10 transition-all">
+                <div className="p-8 md:p-12">
+                  <div className="flex items-start gap-6 mb-6">
+                    <div className="flex-shrink-0 w-16 h-16 bg-cyan-500/10 rounded-xl flex items-center justify-center">
+                      <Bot className="text-cyan-400" size={32} />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="text-sm font-mono text-gray-500">
+                          06
+                        </span>
+                        <h3 className="text-3xl font-bold">
+                          RAG Agent Service
+                        </h3>
+                      </div>
+                      <p className="text-lg text-gray-400 leading-relaxed">
+                        Q&A layer using LangChain and LLMs to generate insights
+                        from system data. Accesses all service databases and
+                        uses Pinecone for semantic search capabilities.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-8">
+                    <div className="cursor-pointer group relative" onClick={() => openLightbox("Cron-Jobs.png")}>
+                      <img
+                        src="Cron-Jobs.png"
+                        alt="RAG Agent Service"
+                        className="w-full rounded-xl border border-white/5 group-hover:border-white/20 transition-all"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all rounded-xl flex items-center justify-center">
+                        <span className="opacity-0 group-hover:opacity-100 text-sm bg-white/10 backdrop-blur px-4 py-2 rounded-lg transition-all">
+                          Click to enlarge
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Deployment Service */}
+              <div className="glass-dark rounded-2xl overflow-hidden border border-white/5 hover:border-white/10 transition-all">
+                <div className="p-8 md:p-12">
+                  <div className="flex items-start gap-6 mb-6">
+                    <div className="flex-shrink-0 w-16 h-16 bg-indigo-500/10 rounded-xl flex items-center justify-center">
+                      <Cloud className="text-indigo-400" size={32} />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="text-sm font-mono text-gray-500">
+                          07
+                        </span>
+                        <h3 className="text-3xl font-bold">Deployment</h3>
+                      </div>
+                      <p className="text-lg text-gray-400 leading-relaxed">
+                        Deployment handled by Docker and orchestrated by AWS
+                        EKS. Automated using Jenkins CI/CD pipeline, pushing to
+                        DockerHub with ArgoCD managing deployment. Monitored by
+                        Prometheus and Grafana.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-8">
+                    <div className="cursor-pointer group relative" onClick={() => openLightbox("Deployment-service.png")}>
+                      <img
+                        src="Deployment-service.png"
+                        alt="Deployment"
+                        className="w-full rounded-xl border border-white/5 group-hover:border-white/20 transition-all"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all rounded-xl flex items-center justify-center">
+                        <span className="opacity-0 group-hover:opacity-100 text-sm bg-white/10 backdrop-blur px-4 py-2 rounded-lg transition-all">
+                          Click to enlarge
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
         {/* Tech Stack */}
-        <section className="mb-16 sm:mb-24 w-full max-w-5xl text-center mx-auto px-2">
-          <h2
-            // Reduced font size on mobile (text-4xl)
-            className="text-4xl sm:text-5xl font-bold mb-8 sm:mb-12 bg-gradient-to-r from-orange-300 to-rose-400 text-transparent bg-clip-text"
-            style={{
-              fontFamily: "'Inter', 'SF Pro Display', system-ui, sans-serif",
-            }}
-          >
-            Tech Stack
-          </h2>
-
-          <div
-            // Changed to a single column on mobile, then 2 columns from 'md'
-            className="grid gap-8 text-left grid-cols-1 md:grid-cols-2 mx-auto"
-            style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
-          >
-            {[
-              {
-                tech: "Postgres",
-                why: "structured relational data (user accounts and profile fields) that requires strong consistency and transactional integrity.",
-                services: "auth-Service and user-service",
-              },
-              {
-                tech: "Prisma ORM",
-                why: "familiar syntax, less boilerplate code and fewer bugs.",
-                services: "with PostgreSQL",
-              },
-              {
-                tech: "MongoDB",
-                why: "flexible document schema for rapidly changing data.",
-                services: "event, auction and live-score services",
-              },
-              {
-                tech: "Socket.IO",
-                why: "enables instant bid updates and live score updates.",
-                services: "real-time communication",
-              },
-              {
-                tech: "Redis",
-                why: "fast read access to frequently requested, non-permanent data.",
-                services: "caching",
-              },
-              {
-                tech: "RabbitMQ",
-                why: "decouples services and enables asynchronous communication.",
-                services: "message queues",
-              },
-              {
-                tech: "Langchain",
-                why: "provides a framework for building and managing AI agents.",
-                services: "AI agent",
-              },
-              {
-                tech: "OpenAI LLM",
-                why: "leverages advanced language models for natural language understanding.",
-                services: "AI analysis",
-              },
-              {
-                tech: "Docker",
-                why: "ensures consistent environments across development and production.",
-                services: "containerization",
-              },
-              {
-                tech: "Kubernetes",
-                why: "automates deployment, scaling, and management of containerized applications.",
-                services: "orchestration",
-              },
-              {
-                tech: "Jenkins",
-                why: "automates the software development process, enabling continuous integration.",
-                services: "CI",
-              },
-              {
-                tech: "ArgoCD",
-                why: "enables continuous delivery and deployment of applications.",
-                services: "CD",
-              },
-              {
-                tech: "AWS EC2",
-                why: "provides scalable compute capacity in the cloud.",
-                services: "deployment",
-              },
-              {
-                tech: "AWS EKS",
-                why: "simplifies running Kubernetes on AWS without needing to install and operate your own Kubernetes control plane.",
-                services: "container orchestration",
-              },
-              {
-                tech: "Prometheus & Grafana",
-                why: "provides powerful monitoring and visualization capabilities for the entire system.",
-                services: "monitoring",
-              },
-            ].map((item, idx) => (
-              <div key={idx} className="text-gray-300">
-                <div className="flex items-start gap-3 sm:gap-4">
-                  <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-xs sm:text-sm">
-                    {idx + 1}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex flex-wrap items-baseline gap-1 sm:gap-2 mb-1">
-                      <span className="font-bold text-base sm:text-lg text-yellow-300">
-                        {item.tech}
-                      </span>
-                      <span className="text-xs sm:text-sm text-white">
-                        for {item.services}
-                      </span>
-                      <span className="text-purple-300 font-semibold text-sm">
-                        Why?
-                      </span>
-                    </div>
-                    <p className="text-gray-400 text-sm sm:text-base">{item.why}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Connect with the Developer (Applied responsiveness to p and h2) */}
-        <section
-          className="mb-16 sm:mb-24 w-full max-w-2xl mx-auto p-4 sm:p-6 bg-gray-800 rounded-lg shadow-xl flex flex-col items-center justify-center space-y-4 sm:space-y-6"
-          style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
-        >
-          {/* Optional: Add a section title if desired */}
-          <h2 className="text-3xl sm:text-4xl font-bold text-center text-blue-300">
-            Connect with the Developer
-          </h2>
-
-          <div className="text-center space-y-3">
-            {/* Full Documentation Link */}
-            <p className="text-base sm:text-lg">
-              <a
-                href="https://github.com/kaustubhduse/SportSync/blob/main/README.md"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-400 hover:text-blue-200 font-semibold underline transition-colors duration-200"
-              >
-                View Full Project Documentation (README.md)
-              </a>
-            </p>
-
-            {/* LinkedIn */}
-            <p className="text-base sm:text-lg text-gray-300">
-              LinkedIn:{" "}
-              <a
-                href="https://www.linkedin.com/in/kaustubh-duse-75a531254/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-400 hover:text-blue-200 underline transition-colors duration-200"
-              >
-                kaustubh-duse
-              </a>
-            </p>
-
-            {/* GitHub */}
-            <p className="text-base sm:text-lg text-gray-300">
-              GitHub:{" "}
-              <a
-                href="https://github.com/kaustubhduse"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-400 hover:text-blue-200 underline transition-colors duration-200"
-              >
-                kaustubhduse
-              </a>
-            </p>
-            <p className="text-base sm:text-lg text-gray-300">
-              Gmail:{" "}
-              <a
-                href="mailto:kaustubhduse2004@gmail.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-400 hover:text-blue-200 underline transition-colors duration-200"
-              >
-                kaustubhduse2004@gmail.com
-              </a>
-            </p>
-
-            {/* Name and Phone */}
-            <div className="pt-3 sm:pt-4 border-t border-gray-700 mt-3 sm:mt-4"> {/* Separator line */}
-              <p className="text-lg sm:text-xl text-white font-semibold">
-                Developed by Kaustubh Duse
+        <section id="stack" className="py-32 px-6 bg-neutral-950/50">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-20">
+              <h2 className="text-5xl md:text-6xl font-bold mb-6">
+                Tech Stack
+              </h2>
+              <div className="w-20 h-1 bg-white mx-auto mb-8"></div>
+              <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+                Modern technologies powering a scalable, distributed system
               </p>
-              <p className="text-gray-400 text-sm sm:text-base">9321992789</p>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                {
+                  icon: Database,
+                  name: "PostgreSQL",
+                  purpose: "Relational data with ACID compliance",
+                  color: "blue",
+                },
+                {
+                  icon: Code,
+                  name: "Prisma ORM",
+                  purpose: "Type-safe database access",
+                  color: "purple",
+                },
+                {
+                  icon: Database,
+                  name: "MongoDB",
+                  purpose: "Flexible document storage",
+                  color: "green",
+                },
+                {
+                  icon: Radio,
+                  name: "Socket.IO",
+                  purpose: "Real-time bidirectional communication",
+                  color: "yellow",
+                },
+                {
+                  icon: Database,
+                  name: "Redis",
+                  purpose: "High-performance caching layer",
+                  color: "red",
+                },
+                {
+                  icon: Layers,
+                  name: "RabbitMQ",
+                  purpose: "Asynchronous message queuing",
+                  color: "orange",
+                },
+                {
+                  icon: Bot,
+                  name: "LangChain",
+                  purpose: "AI agent framework",
+                  color: "cyan",
+                },
+                {
+                  icon: Bot,
+                  name: "OpenAI LLM",
+                  purpose: "Natural language processing",
+                  color: "teal",
+                },
+                {
+                  icon: Container,
+                  name: "Docker",
+                  purpose: "Application containerization",
+                  color: "blue",
+                },
+                {
+                  icon: Settings,
+                  name: "Kubernetes",
+                  purpose: "Container orchestration",
+                  color: "indigo",
+                },
+                {
+                  icon: GitBranch,
+                  name: "Jenkins",
+                  purpose: "Continuous integration",
+                  color: "red",
+                },
+                {
+                  icon: GitBranch,
+                  name: "ArgoCD",
+                  purpose: "GitOps deployment",
+                  color: "orange",
+                },
+                {
+                  icon: Cloud,
+                  name: "AWS EKS",
+                  purpose: "Managed Kubernetes service",
+                  color: "yellow",
+                },
+                {
+                  icon: Server,
+                  name: "Prometheus",
+                  purpose: "Metrics and monitoring",
+                  color: "red",
+                },
+                {
+                  icon: Server,
+                  name: "Grafana",
+                  purpose: "Visualization and dashboards",
+                  color: "orange",
+                },
+              ].map((item, idx) => (
+                <div
+                  key={idx}
+                  className="glass-dark p-6 rounded-xl border border-white/5 hover:border-white/10 transition-all group"
+                >
+                  <div
+                    className={`w-12 h-12 bg-${item.color}-500/10 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}
+                  >
+                    <item.icon className={`text-${item.color}-400`} size={24} />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">{item.name}</h3>
+                  <p className="text-gray-400 text-sm leading-relaxed">
+                    {item.purpose}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
 
+        {/* Contact Section */}
+        <section id="contact" className="py-32 px-6">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-5xl md:text-6xl font-bold mb-6">
+                Get in Touch
+              </h2>
+              <div className="w-20 h-1 bg-white mx-auto mb-8"></div>
+              <p className="text-xl text-gray-400">
+                Let's connect and discuss engineering
+              </p>
+            </div>
+
+            <div className="glass-dark p-12 rounded-2xl border border-white/5">
+              <div className="text-center mb-12">
+                <h3 className="text-3xl font-bold mb-2">Kaustubh Duse</h3>
+                <p className="text-gray-400">Full Stack Developer</p>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <a
+                  href="https://github.com/kaustubhduse"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-4 p-6 glass rounded-xl hover:bg-white/10 transition-all group"
+                >
+                  <div className="w-12 h-12 bg-white/5 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Github size={24} />
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-400">GitHub</div>
+                    <div className="font-medium">kaustubhduse</div>
+                  </div>
+                  <ExternalLink size={16} className="ml-auto text-gray-400" />
+                </a>
+
+                <a
+                  href="https://www.linkedin.com/in/kaustubh-duse-75a531254/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-4 p-6 glass rounded-xl hover:bg-white/10 transition-all group"
+                >
+                  <div className="w-12 h-12 bg-white/5 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Linkedin size={24} />
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-400">LinkedIn</div>
+                    <div className="font-medium">kaustubh-duse</div>
+                  </div>
+                  <ExternalLink size={16} className="ml-auto text-gray-400" />
+                </a>
+
+                <a
+                  href="mailto:kaustubhduse2004@gmail.com"
+                  className="flex items-center gap-4 p-6 glass rounded-xl hover:bg-white/10 transition-all group"
+                >
+                  <div className="w-12 h-12 bg-white/5 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Mail size={24} />
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-400">Email</div>
+                    <div className="font-medium">
+                      kaustubhduse2004@gmail.com
+                    </div>
+                  </div>
+                </a>
+
+                <a
+                  href="tel:9321992789"
+                  className="flex items-center gap-4 p-6 glass rounded-xl hover:bg-white/10 transition-all group"
+                >
+                  <div className="w-12 h-12 bg-white/5 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Phone size={24} />
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-400">Phone</div>
+                    <div className="font-medium">+91 9321992789</div>
+                  </div>
+                </a>
+              </div>
+
+              <div className="mt-10 pt-10 border-t border-white/5 text-center">
+                <a
+                  href="https://github.com/kaustubhduse/SportSync/blob/main/README.md"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+                >
+                  <ExternalLink size={16} />
+                  View Full Documentation
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* Footer */}
-        <footer
-          className="text-gray-600 mt-10 sm:mt-16 text-center pb-8 sm:pb-12"
-          style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
-        >
-          <div className="w-12 sm:w-16 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mx-auto mb-4"></div>
-          <p className="text-base sm:text-lg">&copy; 2025 SportsSync</p>
+        <footer className="py-12 px-6 border-t border-white/5">
+          <div className="max-w-7xl mx-auto text-center text-gray-400">
+            <p>
+              &copy; 2025 SportsSync Engineering. Built with passion and
+              precision.
+            </p>
+          </div>
         </footer>
       </div>
     </div>
