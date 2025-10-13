@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Menu,
   X,
@@ -21,6 +21,9 @@ import {
   GitBranch,
   ChevronLeft,
   ChevronRight,
+  ZoomIn,
+  ZoomOut,
+  Maximize2,
 } from "lucide-react";
 
 const App = () => {
@@ -28,6 +31,11 @@ const App = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const imageContainerRef = useRef(null);
 
   // Define all architecture images with metadata
   const architectureImages = [
@@ -107,21 +115,64 @@ const App = () => {
     return () => window.removeEventListener("keydown", handleKeyPress);
   }, [lightboxOpen, currentImageIndex]);
 
+  // Touch/Swipe support for mobile
+  useEffect(() => {
+    if (!lightboxOpen) return;
+
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    const handleTouchStart = (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    };
+
+    const handleTouchEnd = (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    };
+
+    const handleSwipe = () => {
+      const swipeThreshold = 50;
+      const diff = touchStartX - touchEndX;
+
+      if (Math.abs(diff) > swipeThreshold) {
+        if (diff > 0) {
+          // Swiped left - next image
+          navigateImage("next");
+        } else {
+          // Swiped right - previous image
+          navigateImage("prev");
+        }
+      }
+    };
+
+    window.addEventListener("touchstart", handleTouchStart);
+    window.addEventListener("touchend", handleTouchEnd);
+
+    return () => {
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [lightboxOpen, currentImageIndex]);
+
   const openLightbox = (imageSrc) => {
     const index = architectureImages.findIndex((img) => img.src === imageSrc);
     if (index !== -1) {
       setCurrentImageIndex(index);
       setLightboxOpen(true);
+      resetZoom();
       document.body.style.overflow = "hidden"; // Prevent background scrolling
     }
   };
 
   const closeLightbox = () => {
     setLightboxOpen(false);
+    resetZoom();
     document.body.style.overflow = "unset";
   };
 
   const navigateImage = (direction) => {
+    resetZoom();
     if (direction === "next") {
       setCurrentImageIndex((prev) => (prev + 1) % architectureImages.length);
     } else {
@@ -131,6 +182,120 @@ const App = () => {
       );
     }
   };
+
+  // Zoom functions
+  const resetZoom = () => {
+    setZoomLevel(1);
+    setImagePosition({ x: 0, y: 0 });
+  };
+
+  const handleZoomIn = () => {
+    setZoomLevel((prev) => Math.min(prev + 0.5, 4));
+  };
+
+  const handleZoomOut = () => {
+    setZoomLevel((prev) => {
+      const newZoom = Math.max(prev - 0.5, 1);
+      if (newZoom === 1) {
+        setImagePosition({ x: 0, y: 0 });
+      }
+      return newZoom;
+    });
+  };
+
+  const handleResetZoom = () => {
+    resetZoom();
+  };
+
+  // Mouse wheel zoom
+  useEffect(() => {
+    if (!lightboxOpen) return;
+
+    const handleWheel = (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        const delta = e.deltaY > 0 ? -0.1 : 0.1;
+        setZoomLevel((prev) => {
+          const newZoom = Math.max(1, Math.min(prev + delta, 4));
+          if (newZoom === 1) {
+            setImagePosition({ x: 0, y: 0 });
+          }
+          return newZoom;
+        });
+      }
+    };
+
+    window.addEventListener("wheel", handleWheel, { passive: false });
+    return () => window.removeEventListener("wheel", handleWheel);
+  }, [lightboxOpen]);
+
+  // Pan/drag functionality
+  const handleMouseDown = (e) => {
+    if (zoomLevel > 1) {
+      setIsDragging(true);
+      setDragStart({
+        x: e.clientX - imagePosition.x,
+        y: e.clientY - imagePosition.y,
+      });
+    }
+  };
+
+  const handleMouseMove = (e) => {
+    if (isDragging && zoomLevel > 1) {
+      setImagePosition({
+        x: e.clientX - dragStart.x,
+        y: e.clientY - dragStart.y,
+      });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  // Touch pinch zoom
+  useEffect(() => {
+    if (!lightboxOpen || !imageContainerRef.current) return;
+
+    let initialDistance = 0;
+    let initialZoom = 1;
+
+    const getDistance = (touches) => {
+      const dx = touches[0].clientX - touches[1].clientX;
+      const dy = touches[0].clientY - touches[1].clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    };
+
+    const handleTouchStart = (e) => {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        initialDistance = getDistance(e.touches);
+        initialZoom = zoomLevel;
+      }
+    };
+
+    const handleTouchMove = (e) => {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        const currentDistance = getDistance(e.touches);
+        const scale = currentDistance / initialDistance;
+        const newZoom = Math.max(1, Math.min(initialZoom * scale, 4));
+        setZoomLevel(newZoom);
+        if (newZoom === 1) {
+          setImagePosition({ x: 0, y: 0 });
+        }
+      }
+    };
+
+    const container = imageContainerRef.current;
+    container.addEventListener("touchstart", handleTouchStart, { passive: false });
+    container.addEventListener("touchmove", handleTouchMove, { passive: false });
+
+    return () => {
+      container.removeEventListener("touchstart", handleTouchStart);
+      container.removeEventListener("touchmove", handleTouchMove);
+    };
+  }, [lightboxOpen, zoomLevel]);
 
   const scrollToSection = (id) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
@@ -242,94 +407,159 @@ const App = () => {
         </div>
       </nav>
 
-      {/* Image Lightbox Modal */}
+      {/* Image Lightbox Modal - Advanced with Zoom */}
       {lightboxOpen && (
-        <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex items-center justify-center">
-          {/* Close button */}
-          <button
-            onClick={closeLightbox}
-            className="absolute top-6 right-6 w-12 h-12 glass-dark rounded-full flex items-center justify-center hover:bg-white/10 transition-all group z-10"
-            aria-label="Close lightbox"
-          >
-            <X
-              size={24}
-              className="group-hover:scale-110 transition-transform"
-            />
-          </button>
-
-          {/* Image counter */}
-          <div className="absolute top-6 left-6 glass-dark px-4 py-2 rounded-full text-sm font-mono">
-            {currentImageIndex + 1} / {architectureImages.length}
+        <div 
+          className="fixed inset-0 z-[100] bg-black/98 backdrop-blur-xl"
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+        >
+          {/* Floating Thumbnail Carousel at Top */}
+          <div className="absolute top-0 left-0 right-0 z-20 glass-dark border-b border-white/5">
+            <div className="max-w-7xl mx-auto px-4 py-3">
+              <div className="flex gap-2 overflow-x-auto scrollbar-thin">
+                {architectureImages.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => { setCurrentImageIndex(idx); resetZoom(); }}
+                    className={`relative flex-shrink-0 group transition-all duration-300 ${
+                      idx === currentImageIndex ? "scale-105" : "opacity-60 hover:opacity-100"
+                    }`}
+                  >
+                    <div className={`w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                      idx === currentImageIndex
+                        ? "border-white shadow-lg shadow-white/20"
+                        : "border-white/10 hover:border-white/30"
+                    }`}>
+                      <img
+                        src={img.src}
+                        alt={img.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    {idx === currentImageIndex && (
+                      <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1/2 h-0.5 bg-white rounded-full"></div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
-          {/* Previous button */}
-          <button
-            onClick={() => navigateImage("prev")}
-            className="absolute left-6 w-14 h-14 glass-dark rounded-full flex items-center justify-center hover:bg-white/10 transition-all group"
-            aria-label="Previous image"
-          >
-            <ChevronLeft
-              size={28}
-              className="group-hover:-translate-x-1 transition-transform"
-            />
-          </button>
-
-          {/* Next button */}
-          <button
-            onClick={() => navigateImage("next")}
-            className="absolute right-6 w-14 h-14 glass-dark rounded-full flex items-center justify-center hover:bg-white/10 transition-all group"
-            aria-label="Next image"
-          >
-            <ChevronRight
-              size={28}
-              className="group-hover:translate-x-1 transition-transform"
-            />
-          </button>
-
-          {/* Image container */}
-          <div className="max-w-7xl mx-auto px-20 w-full">
-            <div className="text-center mb-6">
-              <h3 className="text-2xl font-bold mb-2">
-                {architectureImages[currentImageIndex].title}
-              </h3>
-              <p className="text-gray-400">
-                {architectureImages[currentImageIndex].description}
-              </p>
+          {/* Top Controls Bar */}
+          <div className="absolute top-24 left-4 right-4 z-20 flex items-center justify-between">
+            {/* Title & Counter */}
+            <div className="glass-dark px-4 py-2 rounded-xl max-w-md">
+              <div className="flex items-center gap-3">
+                <span className="text-xs font-mono text-gray-400">
+                  {currentImageIndex + 1}/{architectureImages.length}
+                </span>
+                <div className="w-px h-4 bg-white/20"></div>
+                <div>
+                  <h3 className="text-sm md:text-base font-semibold">
+                    {architectureImages[currentImageIndex].title}
+                  </h3>
+                  <p className="text-xs text-gray-400 hidden md:block">
+                    {architectureImages[currentImageIndex].description}
+                  </p>
+                </div>
+              </div>
             </div>
 
-            <div className="relative">
+            {/* Close Button */}
+            <button
+              onClick={closeLightbox}
+              className="glass-dark w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center hover:bg-white/10 transition-all group"
+              aria-label="Close"
+            >
+              <X size={20} className="md:w-6 md:h-6 group-hover:rotate-90 transition-transform duration-300" />
+            </button>
+          </div>
+
+          {/* Zoom Controls - Floating on Right */}
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-2">
+            <button
+              onClick={handleZoomIn}
+              disabled={zoomLevel >= 4}
+              className="glass-dark w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center hover:bg-white/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed group"
+              aria-label="Zoom in"
+            >
+              <ZoomIn size={20} className="md:w-6 md:h-6 group-hover:scale-110 transition-transform" />
+            </button>
+            
+            <div className="glass-dark px-2 py-1 rounded-xl text-xs font-mono text-center">
+              {Math.round(zoomLevel * 100)}%
+            </div>
+            
+            <button
+              onClick={handleZoomOut}
+              disabled={zoomLevel <= 1}
+              className="glass-dark w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center hover:bg-white/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed group"
+              aria-label="Zoom out"
+            >
+              <ZoomOut size={20} className="md:w-6 md:h-6 group-hover:scale-110 transition-transform" />
+            </button>
+            
+            <button
+              onClick={handleResetZoom}
+              disabled={zoomLevel === 1}
+              className="glass-dark w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center hover:bg-white/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed group"
+              aria-label="Reset zoom"
+            >
+              <Maximize2 size={18} className="md:w-5 md:h-5 group-hover:scale-110 transition-transform" />
+            </button>
+          </div>
+
+          {/* Navigation Arrows */}
+          <button
+            onClick={() => navigateImage("prev")}
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-16 md:h-16 glass-dark rounded-xl flex items-center justify-center hover:bg-white/10 transition-all group"
+            aria-label="Previous"
+          >
+            <ChevronLeft size={24} className="md:w-8 md:h-8 group-hover:-translate-x-1 transition-transform" />
+          </button>
+
+          <button
+            onClick={() => navigateImage("next")}
+            className="absolute right-20 md:right-24 top-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-16 md:h-16 glass-dark rounded-xl flex items-center justify-center hover:bg-white/10 transition-all group"
+            aria-label="Next"
+          >
+            <ChevronRight size={24} className="md:w-8 md:h-8 group-hover:translate-x-1 transition-transform" />
+          </button>
+
+          {/* Main Image Container with Zoom & Pan */}
+          <div className="absolute inset-0 flex items-center justify-center pt-32 pb-8">
+            <div 
+              ref={imageContainerRef}
+              className="relative w-full h-full flex items-center justify-center overflow-hidden"
+              style={{ cursor: zoomLevel > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default' }}
+            >
               <img
                 src={architectureImages[currentImageIndex].src}
                 alt={architectureImages[currentImageIndex].title}
-                className="w-full h-auto max-h-[70vh] object-contain rounded-xl"
+                className="max-w-full max-h-full object-contain rounded-xl transition-transform duration-200 select-none"
+                style={{
+                  transform: `scale(${zoomLevel}) translate(${imagePosition.x / zoomLevel}px, ${imagePosition.y / zoomLevel}px)`,
+                  transformOrigin: 'center center',
+                }}
+                onMouseDown={handleMouseDown}
+                draggable={false}
               />
-            </div>
-
-            {/* Thumbnail navigation */}
-            <div className="flex gap-2 mt-6 overflow-x-auto pb-2 scrollbar-thin justify-center">
-              {architectureImages.map((img, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setCurrentImageIndex(idx)}
-                  className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
-                    idx === currentImageIndex
-                      ? "border-white scale-110"
-                      : "border-white/20 opacity-50 hover:opacity-100"
-                  }`}
-                >
-                  <img
-                    src={img.src}
-                    alt={img.title}
-                    className="w-full h-full object-cover"
-                  />
-                </button>
-              ))}
             </div>
           </div>
 
-          {/* Keyboard shortcuts hint */}
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 glass-dark px-4 py-2 rounded-full text-xs text-gray-400">
-            Use arrow keys or swipe to navigate • ESC to close
+          {/* Bottom Hint Bar */}
+          <div className="absolute bottom-0 left-0 right-0 z-20 glass-dark border-t border-white/5">
+            <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-center gap-6 text-xs text-gray-400">
+              <span className="hidden md:inline">Arrow keys: Navigate</span>
+              <span className="hidden md:inline">•</span>
+              <span>Scroll/Pinch: Zoom</span>
+              <span className="hidden md:inline">•</span>
+              <span className="hidden md:inline">Drag: Pan (when zoomed)</span>
+              <span>•</span>
+              <span>ESC: Close</span>
+            </div>
           </div>
         </div>
       )}

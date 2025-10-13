@@ -33,4 +33,35 @@
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.05);
   }
+
+  /* Custom scrollbar for thumbnail carousel */
+  .scrollbar-thin::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    transition: background 0.3s ease;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+  }
+
+  /* Hide scrollbar for mobile but keep functionality */
+  @media (max-width: 768px) {
+    .scrollbar-thin::-webkit-scrollbar {
+      display: none;
+    }
+    .scrollbar-thin {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  }
 }
