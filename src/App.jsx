@@ -35,7 +35,11 @@ const App = () => {
   const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const imageContainerRef = useRef(null);
+  const [imageContainerRef, thumbnailContainerRef] = [
+    useRef(null),
+    useRef(null),
+  ];
+  const [imageLoaded, setImageLoaded] = useState(true);
 
   // Define all architecture images with metadata
   const architectureImages = [
@@ -108,6 +112,18 @@ const App = () => {
         navigateImage("prev");
       } else if (e.key === "ArrowRight") {
         navigateImage("next");
+      } else if (e.key === "+" || e.key === "=") {
+        // Zoom in with + or =
+        e.preventDefault();
+        handleZoomIn();
+      } else if (e.key === "-" || e.key === "_") {
+        // Zoom out with -
+        e.preventDefault();
+        handleZoomOut();
+      } else if (e.key === "0") {
+        // Reset zoom with 0
+        e.preventDefault();
+        handleResetZoom();
       }
     };
 
@@ -175,15 +191,42 @@ const App = () => {
   };
 
   const navigateImage = (direction) => {
+    setImageLoaded(false);
     resetZoom();
-    if (direction === "next") {
-      setCurrentImageIndex((prev) => (prev + 1) % architectureImages.length);
-    } else {
-      setCurrentImageIndex(
-        (prev) =>
-          (prev - 1 + architectureImages.length) % architectureImages.length
-      );
-    }
+    setTimeout(() => {
+      if (direction === "next") {
+        setCurrentImageIndex((prev) => {
+          const newIndex = (prev + 1) % architectureImages.length;
+          scrollThumbnailIntoView(newIndex);
+          return newIndex;
+        });
+      } else {
+        setCurrentImageIndex((prev) => {
+          const newIndex =
+            (prev - 1 + architectureImages.length) % architectureImages.length;
+          scrollThumbnailIntoView(newIndex);
+          return newIndex;
+        });
+      }
+      setTimeout(() => setImageLoaded(true), 50);
+    }, 150);
+  };
+
+  // Scroll selected thumbnail into view
+  const scrollThumbnailIntoView = (index) => {
+    setTimeout(() => {
+      const container = thumbnailContainerRef.current;
+      if (container) {
+        const thumbnails = container.children;
+        if (thumbnails[index]) {
+          thumbnails[index].scrollIntoView({
+            behavior: "smooth",
+            block: "nearest",
+            inline: "center",
+          });
+        }
+      }
+    }, 100);
   };
 
   // Zoom functions
@@ -193,12 +236,12 @@ const App = () => {
   };
 
   const handleZoomIn = () => {
-    setZoomLevel((prev) => Math.min(prev + 0.5, 4));
+    setZoomLevel((prev) => Math.min(prev + 0.25, 4));
   };
 
   const handleZoomOut = () => {
     setZoomLevel((prev) => {
-      const newZoom = Math.max(prev - 0.5, 1);
+      const newZoom = Math.max(prev - 0.25, 1);
       if (newZoom === 1) {
         setImagePosition({ x: 0, y: 0 });
       }
@@ -217,7 +260,7 @@ const App = () => {
     const handleWheel = (e) => {
       if (e.ctrlKey || e.metaKey) {
         e.preventDefault();
-        const delta = e.deltaY > 0 ? -0.1 : 0.1;
+        const delta = e.deltaY > 0 ? -0.15 : 0.15;
         setZoomLevel((prev) => {
           const newZoom = Math.max(1, Math.min(prev + delta, 4));
           if (newZoom === 1) {
@@ -293,17 +336,20 @@ const App = () => {
 
     const handleTouchMove = (e) => {
       if (e.touches.length === 2) {
-        // Pinch zoom
+        // Pinch zoom with smoother scaling
         e.preventDefault();
         const currentDistance = getDistance(e.touches);
         const scale = currentDistance / initialDistance;
-        const newZoom = Math.max(1, Math.min(initialZoom * scale, 4));
+        // Apply smoother zoom with damping
+        const dampingFactor = 0.8;
+        const adjustedScale = 1 + (scale - 1) * dampingFactor;
+        const newZoom = Math.max(1, Math.min(initialZoom * adjustedScale, 4));
         setZoomLevel(newZoom);
         if (newZoom === 1) {
           setImagePosition({ x: 0, y: 0 });
         }
       } else if (e.touches.length === 1 && isPanning && zoomLevel > 1) {
-        // Pan
+        // Pan with smoother movement
         e.preventDefault();
         const currentX = e.touches[0].clientX;
         const currentY = e.touches[0].clientY;
@@ -528,35 +574,39 @@ const App = () => {
             </div>
 
             {/* Thumbnail List */}
-            <div className="flex gap-2 sm:gap-2.5 md:gap-3 overflow-x-auto scrollbar-thin px-3 py-3 sm:px-4 sm:py-4 snap-x snap-mandatory">
+            <div
+              ref={thumbnailContainerRef}
+              className="flex gap-2 sm:gap-2.5 md:gap-3 overflow-x-auto scrollbar-thin px-3 py-3 sm:px-4 sm:py-4 snap-x snap-mandatory scroll-smooth"
+            >
               {architectureImages.map((img, idx) => (
                 <button
                   key={idx}
                   onClick={() => {
                     setCurrentImageIndex(idx);
                     resetZoom();
+                    scrollThumbnailIntoView(idx);
                   }}
-                  className={`relative flex-shrink-0 transition-all duration-200 snap-center ${
+                  className={`relative flex-shrink-0 transition-all duration-300 ease-out snap-center ${
                     idx === currentImageIndex
                       ? "scale-110"
-                      : "opacity-60 hover:opacity-100 scale-95"
+                      : "opacity-60 hover:opacity-100 scale-95 hover:scale-100"
                   }`}
                 >
                   <div
-                    className={`w-14 h-14 sm:w-16 sm:h-16 md:w-18 md:h-18 rounded-lg overflow-hidden border-2 transition-all ${
+                    className={`w-14 h-14 sm:w-16 sm:h-16 md:w-18 md:h-18 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
                       idx === currentImageIndex
                         ? "border-white shadow-lg shadow-white/20"
-                        : "border-white/20"
+                        : "border-white/20 hover:border-white/40"
                     }`}
                   >
                     <img
                       src={img.src}
                       alt={img.title}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
                     />
                   </div>
                   {idx === currentImageIndex && (
-                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2/3 h-1 bg-white rounded-full"></div>
+                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2/3 h-1 bg-white rounded-full transition-all duration-300"></div>
                   )}
                 </button>
               ))}
@@ -647,7 +697,9 @@ const App = () => {
               <img
                 src={architectureImages[currentImageIndex].src}
                 alt={architectureImages[currentImageIndex].title}
-                className="max-w-full max-h-full object-contain rounded-lg transition-transform duration-200 select-none"
+                className={`max-w-full max-h-full object-contain rounded-lg select-none transition-all duration-300 ease-out ${
+                  imageLoaded ? "opacity-100" : "opacity-0"
+                }`}
                 style={{
                   transform: `scale(${zoomLevel}) translate(${
                     imagePosition.x / zoomLevel
@@ -655,6 +707,7 @@ const App = () => {
                   transformOrigin: "center center",
                 }}
                 onMouseDown={handleMouseDown}
+                onLoad={() => setImageLoaded(true)}
                 draggable={false}
               />
             </div>
@@ -663,13 +716,17 @@ const App = () => {
           {/* Bottom Hint - Desktop Only */}
           <div className="hidden md:block flex-shrink-0 glass-dark border-t border-white/5 px-4 py-2">
             <div className="flex items-center justify-center gap-3 text-xs text-gray-400">
-              <span>Arrow keys: Navigate</span>
+              <span>← → : Navigate</span>
               <span>•</span>
-              <span>Scroll/Pinch: Zoom</span>
+              <span>+ - : Zoom</span>
               <span>•</span>
-              <span>Drag: Pan</span>
+              <span>0 : Reset</span>
               <span>•</span>
-              <span>ESC: Close</span>
+              <span>Ctrl+Scroll : Zoom</span>
+              <span>•</span>
+              <span>Drag : Pan</span>
+              <span>•</span>
+              <span>ESC : Close</span>
             </div>
           </div>
         </div>
